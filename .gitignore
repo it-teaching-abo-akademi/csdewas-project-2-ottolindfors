@@ -22,6 +22,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+
+
+
 # Created by https://www.gitignore.io/api/node,react,webstorm
 # Edit at https://www.gitignore.io/?templates=node,react,webstorm
 
@@ -132,6 +135,9 @@ sketch
 ### WebStorm ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+# Added by me
+.idea/
 
 # User-specific stuff
 .idea/**/workspace.xml
