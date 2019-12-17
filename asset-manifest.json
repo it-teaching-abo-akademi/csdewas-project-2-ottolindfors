@@ -1,23 +1,22 @@
 {
   "files": {
-    "main.css": "/csdewas-project-2-ottolindfors/static/css/main.d1b05096.chunk.css",
-    "main.js": "/csdewas-project-2-ottolindfors/static/js/main.cbbf5b23.chunk.js",
-    "main.js.map": "/csdewas-project-2-ottolindfors/static/js/main.cbbf5b23.chunk.js.map",
+    "main.css": "/csdewas-project-2-ottolindfors/static/css/main.5facb584.chunk.css",
+    "main.js": "/csdewas-project-2-ottolindfors/static/js/main.eb7b164d.chunk.js",
+    "main.js.map": "/csdewas-project-2-ottolindfors/static/js/main.eb7b164d.chunk.js.map",
     "runtime-main.js": "/csdewas-project-2-ottolindfors/static/js/runtime-main.7a02a958.js",
     "runtime-main.js.map": "/csdewas-project-2-ottolindfors/static/js/runtime-main.7a02a958.js.map",
-    "static/js/2.e95ce62f.chunk.js": "/csdewas-project-2-ottolindfors/static/js/2.e95ce62f.chunk.js",
-    "static/js/2.e95ce62f.chunk.js.map": "/csdewas-project-2-ottolindfors/static/js/2.e95ce62f.chunk.js.map",
+    "static/js/2.db48f7d5.chunk.js": "/csdewas-project-2-ottolindfors/static/js/2.db48f7d5.chunk.js",
+    "static/js/2.db48f7d5.chunk.js.map": "/csdewas-project-2-ottolindfors/static/js/2.db48f7d5.chunk.js.map",
     "index.html": "/csdewas-project-2-ottolindfors/index.html",
-    "precache-manifest.65ad3207a0723646fd1d047da6a31162.js": "/csdewas-project-2-ottolindfors/precache-manifest.65ad3207a0723646fd1d047da6a31162.js",
+    "precache-manifest.2c0bacd4ee0c054e4c6978e5a9f7012c.js": "/csdewas-project-2-ottolindfors/precache-manifest.2c0bacd4ee0c054e4c6978e5a9f7012c.js",
     "service-worker.js": "/csdewas-project-2-ottolindfors/service-worker.js",
-    "static/css/main.d1b05096.chunk.css.map": "/csdewas-project-2-ottolindfors/static/css/main.d1b05096.chunk.css.map",
-    "static/js/2.e95ce62f.chunk.js.LICENSE": "/csdewas-project-2-ottolindfors/static/js/2.e95ce62f.chunk.js.LICENSE",
-    "static/media/logo.svg": "/csdewas-project-2-ottolindfors/static/media/logo.5d5d9eef.svg"
+    "static/css/main.5facb584.chunk.css.map": "/csdewas-project-2-ottolindfors/static/css/main.5facb584.chunk.css.map",
+    "static/js/2.db48f7d5.chunk.js.LICENSE": "/csdewas-project-2-ottolindfors/static/js/2.db48f7d5.chunk.js.LICENSE"
   },
   "entrypoints": [
     "static/js/runtime-main.7a02a958.js",
-    "static/js/2.e95ce62f.chunk.js",
-    "static/css/main.d1b05096.chunk.css",
-    "static/js/main.cbbf5b23.chunk.js"
+    "static/js/2.db48f7d5.chunk.js",
+    "static/css/main.5facb584.chunk.css",
+    "static/js/main.eb7b164d.chunk.js"
   ]
 }
