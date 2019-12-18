@@ -4,84 +4,68 @@ A playground for testing arround in ordet to get the data from the API while kee
 
 import React from 'react';
 import './App.css';
-
-const TOKEN = 'Tpk_391653b184fb45f2a8e9b1270c0306e9';
-const BASE_URL = 'https://sandbox.iexapis.com/stable/stock/market/batch?';
-const TEST_URL = 'https://sandbox.iexapis.com/stable/stock/market/batch?symbols=aapl,fb,twtr&types=quote&range=5d&token=Tpk_391653b184fb45f2a8e9b1270c0306e9';
+import {urlBuilder} from "./api";
 
 class Portfolio extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            stockSymbols: [],
-            quoteData: [],
+            // stockSymbols: [],
+            stockSymbols: ['AAPL', 'FB', 'TWTR'],
+            quoteData: [],  // Latest data from today
+            chartData: [],  // historic data
+            // chartRange: null,
+            chartRange: '5d',
             error: null,
         };
     }
 
-    buildQuoteURL(symbolsArr, range, type) {
+    dataFetcher(stockSymbols, type, chartRange) {
         /*
-        Builds the url for fetching stock data from api.
-        - symbolsArr is an array of stock symbols as strings.
-        - range is the timespan as string that should be fetched (1d, 5d, 1m, ...).
-        - type is 'quote' or 'chart'
+        Fetches lates quote for all stockSymbols
+        or
+        Fetches historic stock data (chart data) for all stockSymbols
          */
-        let url = BASE_URL;
-        let sym = 'symbols=';
-        let typ = '&types=';
-        let ran = '&range=';
-        let tok = '&token=';
-
-        // Append symbols to the url
-        for (let i=0; i<symbolsArr.length; i++) {
-            sym += symbolsArr[i];
-            if (i < symbolsArr.length - 1) {
-                // Append ',' after symbol except after last one
-                sym += ',';
-            }
-        }
-        url += sym;
-
-        // Append types to the url
-        url += typ + type;
-
-        // Append range to the url
-        url += ran + range;
-
-        // Append token to the url
-        url += tok + TOKEN;
-
-        console.log(url);
+        const apiUrl = urlBuilder(stockSymbols, type, chartRange);
+        let data = [];
+        fetch(apiUrl)
+            .then(response => {
+                // Parse json
+                if (response.ok) { return response.json() }
+                else { throw new Error("Error while fetching from api...") }
+            })
+            .then(jsonData => {
+                // Extract key (stock symbol) and value (latest quote / chart data)
+                for (let [key, value] of Object.entries(jsonData)) {
+                    if (jsonData.hasOwnProperty(key)){
+                        data[key] = value[type];
+                    }
+                }
+            })
+            .catch(error => this.setState({ error: error}));
+        return data;
     }
 
     componentDidMount() {
-        // Fetch stock data for all stocks in portfolio
-        fetch(TEST_URL)
-            .then(response => {
-                if (response.ok) { return response.json() }
-                else { throw new Error("Error while fetching ...") }
-            })
-            .then(jsonData => {
-                let stockSymbols = [];
-                for (let key in jsonData) {
-                    if (jsonData.hasOwnProperty(key)) { stockSymbols.push(key) }
-                }
+        /*
+        Fetch stock data after component has rendered.
+         */
+        const stockSymbols = this.state.stockSymbols;
+        const chartRange = this.state.chartRange;
 
-                let quoteData = [];
-                for (let i=0; i<stockSymbols.length; i++) {
-                    const stock = stockSymbols[i];
-                    quoteData[stock] = jsonData[stock].quote;  // .quote is a key in the json that comes from the api
-                    // Usage: console.log(quoteData[stock].latestPrice);
-                }
-
-                console.log(stockSymbols);
-                console.log(quoteData);
-            })
-            .catch(error => this.setState({ error: error}))
+        let quoteData = [];
+        let chartData = [];
+        quoteData = this.dataFetcher(stockSymbols, 'quote');
+        chartData = this.dataFetcher(stockSymbols, 'chart', chartRange);
+        this.setState({
+            quoteData: quoteData,
+            chartData: chartData,
+        });
     }
 
     render() {
-        this.buildQuoteURL(['ett', 'tva', 'tre'], '5d', 'quote');
+        console.log(this.state);
+        // console.log(urlBuilder(['AAPL', 'FB', 'TWTR'], 'chart', '5d'));
         const error = this.state.error;
         if (error) { return <p>{error.message}</p> }
         return <p>Portfolio</p>;
@@ -92,14 +76,15 @@ class TestApp extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            portfolios: [],
+            // portfolios: [],
+            portfolios: ["Portfolio 0", "Portfolio 1", "Portfolio 2"],
         };
     }
 
     render() {
         return (
             <div className="App">
-                <h1>Hello</h1>
+                <h1>SPMS</h1>
                 <Portfolio />
             </div>
         );
