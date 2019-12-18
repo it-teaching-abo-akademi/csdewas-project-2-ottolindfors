@@ -1,0 +1,59 @@
+The API works something like this
+
+
+Base URL:
+https://sandbox.iexapis.com/stable/stock/
+
+Token:
+Tpk_391653b184fb45f2a8e9b1270c0306e9
+
+
+Latest quote info:
+/aapl/quote/?token=
+- Returns: symbol, companyName, primaryExchange, latestPrice, latestSource, latestTime, latestUpdate, ...
+
+
+LatestPrice:
+/aapl/quote/latestPrice?token=
+- Returns: number (e.g. 285.23)
+
+
+History (Nd (N days), Nm (N months), Ny (N years)):
+/aapl/chart/5y?token=
+
+
+Value for a given day:
+/aapl/chart/date/YYYYMMDD?chartByDay=true&token=
+
+
+Access multiple stocks (aapl, fb, twtr):
+/market/batch?symbols=aapl,fb,twtr&types=quote,chart&range=1m&token=
+- Input (useful):
+  - symbols = aapl,fb,twtr
+  - types = quote,chart
+  - range = 1m
+- Returns:
+  > AAPL
+    > chart
+      > 0
+        date
+        label
+        open
+        close
+        high
+        low
+        ...
+      > 1
+      > 2
+      > ...
+    > quote
+      symbol
+      companyName
+      primaryExchange
+      latestPrice
+      latestSource
+      ...
+  > FB
+  > TWTR
+
+https://sandbox.iexapis.com/stable/stock/market/batch?symbols=aapl,fb,twtr&types=quote,chart&range=1m&token=Tpk_391653b184fb45f2a8e9b1270c0306e9
