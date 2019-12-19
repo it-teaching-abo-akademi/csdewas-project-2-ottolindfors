@@ -4,6 +4,7 @@ import {urlBuilder} from "./api";
 import {loadFromLocalStorage} from "./myFunctions";
 
 const LOCALSTORAGE_PORTFOLIOS_NAME = 'portfolios';
+const LOCALSTORAGE_APPDATA_NAME = 'appData';
 
 class Portfolio extends React.Component {
     constructor(props) {
@@ -88,24 +89,8 @@ class App extends React.Component {
         };
     }
 
-    /*
-    USAGE (har testat och JSON.stringify() fungerar)
-
-    // Add new empty stock
-    jsonData["STK"] = {};
-
-    // Add new empty chart
-    jsonData["STK"]["chart"] = [];
-
-    // Add new entry in chart
-    jsonData["STK"]["chart"].push({date: "1994-02-16", open: 19.99});
-    jsonData["STK"]["chart"].push({date: "1994-02-16", open: 29.99});
-     */
+    // Fetches latest quote and/or chart (historic data) for all stockSymbols
     dataFetcher(stockSymbols, type, chartRange) {
-        /*
-        Fetches latest quote and/or chart (historic data) for all stockSymbols.
-         */
-
         const apiUrl = urlBuilder(stockSymbols, type, chartRange);
         return fetch(apiUrl)
             .then(response => {
@@ -124,7 +109,7 @@ class App extends React.Component {
             .catch(error => this.setState({error: error}));
     }
 
-    // Add individual elements
+    // Add individual elements to the appData state
     addEmptyPortfolio(newPortfolioName) {
         // Get appData from state
         let appData = this.state.appData;
@@ -133,7 +118,7 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("new portfolio:", newPortfolioName)
+            () => console.log("==> new empty portfolio added")
             );
     }
     addEmptyStock(toPortfolio, newStockName) {
@@ -144,7 +129,7 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("new stock:", newStockName)
+            () => console.log("==> new empty stock added")
         );
     }
     addEmptyChart(toPortfolio, toStock) {
@@ -155,7 +140,7 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("new chart to stock:", toStock)
+            () => console.log("==> new empty chart added")
         );
     }
     addChartElement(toPortfolio, toStock, newObjectWithData) {
@@ -169,7 +154,7 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("new chart element:", newObjectWithData)
+            () => console.log("==> new chart element added")
         );
     }
     addQuote(toPortfolio, toStock, newObjectWithData) {
@@ -183,7 +168,7 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("new quote to stock:", newObjectWithData)
+            () => console.log("==> new quote added")
         );
     }
     addPurchase(toPortfolio, toStock, newObjectWithData) {
@@ -197,11 +182,21 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("new purchase to stock:", newObjectWithData)
+            () => console.log("==> new purchase added")
         );
     }
+    addDummyPurchase(toPortfolio) {
+        // Get appData from state
+        let appData = this.state.appData[toPortfolio];
+        for (let key in appData) {
+            if (appData.hasOwnProperty(key)) {
+                const dummy = {date: "1970-01-01", open: 10.00};
+                this.addPurchase(toPortfolio, key, dummy)
+            }
+        }
+    }
 
-    // Append a whole existing portfolio at once
+    // Append a whole existing portfolio at once to the appData state
     appendPortfolio(newPortfolioName, existingPortfolioContent) {
         // Get appData from state
         let appData = this.state.appData;
@@ -210,7 +205,20 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("appended portfolio:", appData)
+            () => console.log("==> appended portfolio")
+        );
+    }
+
+    // Create and append a whole portfolio at once (with dummy 'purchase' element) to the appData state
+    createAndAppendPortfolio(newPortfolioName, stockSymbols, type, chartRange) {
+        // dataFetcher uses fetch() so it returns a promise. Therefore newPortfolio.then() to access the result value.
+        const newPortfolio = this.dataFetcher(stockSymbols, type, chartRange);
+        newPortfolio.then(value =>
+            {
+                this.appendPortfolio(newPortfolioName, value);
+                // Remove next line to remove dummy purchase values
+                this.addDummyPurchase(newPortfolioName)
+            }
         );
     }
 
@@ -220,20 +228,17 @@ class App extends React.Component {
         IF THERE IS NOTHING IN LOCAL STORAGE THEN LOAD FROM INTERNET (MAYBE ONLY WHEN PRESSING UI REFRESH/GET BUTTON)
          */
 
+        // *** CREATE DUMMY DATA ***
         this.addEmptyPortfolio("My New Portfolio");
         this.addEmptyStock("My New Portfolio", "OOT");
         this.addEmptyChart("My New Portfolio", "OOT");
         this.addChartElement("My New Portfolio", "OOT", {date: "1994-02-16", open: 29.99});
         this.addChartElement("My New Portfolio", "OOT", {date: "1994-03-16", open: 29.99});
         this.addQuote("My New Portfolio", "OOT", {date: "1994-03-16", latestPrice: 29.99});
-        this.addPurchase("My New Portfolio", "OOT", {date: "1994-02-16", latestPrice: 999.99});
-
+        this.addPurchase("My New Portfolio", "OOT", {date: "1994-02-16", value: 999.99});
         this.appendPortfolio("My Append Portfolio", this.state.appData["My New Portfolio"]);
+        this.createAndAppendPortfolio("My Big Portfolio", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', '5d');
 
-        // Create a whole portfolio and then append it
-        // dataFetcher uses fetch() so it returns a promise. Therefore newPortfolio.then() to acces the result value.
-        const newPortfolio = this.dataFetcher(["AAPL","GOOGL","TWTR","FB"], 'quote,chart', '5d');
-        newPortfolio.then(value => this.appendPortfolio("Big Portfolio", value));
 
         /*
         Load array of portfolio names from local storage.
