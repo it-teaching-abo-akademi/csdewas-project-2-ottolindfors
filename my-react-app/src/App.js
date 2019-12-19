@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import {urlBuilder} from "./api";
-import {loadFromLocalStorage} from "./myFunctions";
+import {loadFromLocalStorage, saveToLocalStorage} from "./myFunctions";
 
 const LOCALSTORAGE_PORTFOLIOS_NAME = 'portfolios';
 const LOCALSTORAGE_APPDATA_NAME = 'appData';
@@ -118,7 +118,11 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("==> new empty portfolio added")
+            () => {
+                console.log("==> new empty portfolio added");
+                console.log("==> Saving to local storage");
+                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+            }
             );
     }
     addEmptyStock(toPortfolio, newStockName) {
@@ -129,7 +133,11 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("==> new empty stock added")
+            () => {
+                console.log("==> new empty stock added");
+                console.log("==> Saving to local storage");
+                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+            }
         );
     }
     addEmptyChart(toPortfolio, toStock) {
@@ -140,7 +148,11 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("==> new empty chart added")
+            () => {
+                console.log("==> new empty chart added");
+                console.log("==> Saving to local storage");
+                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+            }
         );
     }
     addChartElement(toPortfolio, toStock, newObjectWithData) {
@@ -154,7 +166,11 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("==> new chart element added")
+            () => {
+                console.log("==> new chart element added");
+                console.log("==> Saving to local storage");
+                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+            }
         );
     }
     addQuote(toPortfolio, toStock, newObjectWithData) {
@@ -168,7 +184,11 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("==> new quote added")
+            () => {
+                console.log("==> new quote added");
+                console.log("==> Saving to local storage");
+                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+            }
         );
     }
     addPurchase(toPortfolio, toStock, newObjectWithData) {
@@ -182,7 +202,11 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("==> new purchase added")
+            () => {
+                console.log("==> new purchase added");
+                console.log("==> Saving to local storage");
+                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+            }
         );
     }
     addDummyPurchase(toPortfolio) {
@@ -195,7 +219,6 @@ class App extends React.Component {
             }
         }
     }
-
     // Append a whole existing portfolio at once to the appData state
     appendPortfolio(newPortfolioName, existingPortfolioContent) {
         // Get appData from state
@@ -205,10 +228,12 @@ class App extends React.Component {
         // Set new state
         this.setState(
             { appData: appData },
-            () => console.log("==> appended portfolio")
+            () => {
+                console.log("==> appended portfolio");
+                console.log("==> Saving to local storage");
+                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);            }
         );
     }
-
     // Create and append a whole portfolio at once (with dummy 'purchase' element) to the appData state
     createAndAppendPortfolio(newPortfolioName, stockSymbols, type, chartRange) {
         // dataFetcher uses fetch() so it returns a promise. Therefore newPortfolio.then() to access the result value.
@@ -228,7 +253,12 @@ class App extends React.Component {
         IF THERE IS NOTHING IN LOCAL STORAGE THEN LOAD FROM INTERNET (MAYBE ONLY WHEN PRESSING UI REFRESH/GET BUTTON)
          */
 
+        /*
+        Load array of portfolio names from local storage.
+        Throws error if not found and fails silently outputting error only to console.
+         */
         // *** CREATE DUMMY DATA ***
+        console.log("==> Creating dummy data: ");
         this.addEmptyPortfolio("My New Portfolio");
         this.addEmptyStock("My New Portfolio", "OOT");
         this.addEmptyChart("My New Portfolio", "OOT");
@@ -238,26 +268,22 @@ class App extends React.Component {
         this.addPurchase("My New Portfolio", "OOT", {date: "1994-02-16", value: 999.99});
         this.appendPortfolio("My Append Portfolio", this.state.appData["My New Portfolio"]);
         this.createAndAppendPortfolio("My Big Portfolio", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', '5d');
-
-
-        /*
-        Load array of portfolio names from local storage.
-        Throws error if not found and fails silently outputting error only to console.
-         */
         try {
             const portfolios = loadFromLocalStorage(LOCALSTORAGE_PORTFOLIOS_NAME);  // Trows error if not found
+            //const appData = loadFromLocalStorage(LOCALSTORAGE_APPDATA_NAME);  // Trows error if not found
             this.setState(
                 { portfolios: portfolios },
                 () => console.log("==> Loaded 'portfolios' from local storage")
             );
         }
         catch (error) {
-            console.log("==>", error)
+            console.log("==>", error);
         }
     }
 
     render() {
         // Render portfolios
+        console.log("appData: ", this.state.appData);
         return (
             <div className="App">
                 <h1>SPMS</h1>

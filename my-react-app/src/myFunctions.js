@@ -10,6 +10,17 @@ function loader(objName) {
     return data;
 }
 
+function saver(obj, objName) {
+    /*
+    Saves an JSON object to local storage.
+     */
+    let data = localStorage.setItem(objName, JSON.stringify(obj));
+}
+
 export const loadFromLocalStorage = (objName) => {
   return loader(objName);
+};
+
+export const saveToLocalStorage = (obj, objName) => {
+    return saver(obj, objName);
 };
