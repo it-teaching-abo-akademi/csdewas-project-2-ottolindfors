@@ -20,49 +20,6 @@ class Portfolio extends React.Component {
         };
     }
 
-    savePortfolio(data) {
-        /*
-        Saves the portfolio (data) to local storage.
-         */
-        const portfolioName = this.props.name;
-        localStorage.setItem(portfolioName, JSON.stringify(data));
-        console.log("==> Saved portfolio '" + portfolioName + "' to local storage after fetching from api.");
-    }
-
-    dataFetcher(stockSymbols, type, chartRange) {
-        /*
-        Fetches latest quote and/or chart (historic data) for all stockSymbols.
-         */
-        const apiUrl = urlBuilder(stockSymbols, type, chartRange);
-        this.setState({ loading: true });  // For loading indicator
-        fetch(apiUrl)
-            .then(response => {
-                // "Parse" json
-                if (response.ok) { return response.json() }
-                else { throw new Error("Error while fetching from api...") }
-            })
-            .then(jsonData => {
-                // Extract data and save to local storage
-                console.log(jsonData);
-                this.setState(
-                    { data: jsonData, loading: false },
-                    () => this.savePortfolio(jsonData)
-                );
-            })
-            .catch(error => this.setState({ error: error}));
-    }
-
-    componentDidMount() {
-        /*
-        After component has mounted.
-        Tries to load from local storage first then fetches stock data.
-         */
-        // TODO: Try to load from local storage first. Then fetch newest data.
-        const stockSymbols = this.state.stockSymbols;
-        const chartRange = this.state.chartRange;
-        this.dataFetcher(stockSymbols, 'quote,chart', chartRange);
-    }
-
     render() {
         // Render error if any
         const error = this.state.error;
@@ -247,17 +204,14 @@ class App extends React.Component {
         );
     }
 
+    // Load data from local storage if avalible
     componentDidMount() {
         /*
         FIRST TRY LOADING DATA FROM LOCAL STORAGE.
-        IF THERE IS NOTHING IN LOCAL STORAGE THEN LOAD FROM INTERNET (MAYBE ONLY WHEN PRESSING UI REFRESH/GET BUTTON)
+        IF THERE IS NOTHING IN LOCAL STORAGE THEN LOAD FROM INTERNET (BUT ONLY ON USER INPUT REFRESH/GET/ADD BUTTON)
          */
 
-        /*
-        Load array of portfolio names from local storage.
-        Throws error if not found and fails silently outputting error only to console.
-         */
-        // *** CREATE DUMMY DATA ***
+        // *** CREATE DUMMY DATA. DO NOT USE IN PRODUCTION ***
         console.log("==> Creating dummy data: ");
         this.addEmptyPortfolio("My New Portfolio");
         this.addEmptyStock("My New Portfolio", "OOT");
@@ -268,12 +222,19 @@ class App extends React.Component {
         this.addPurchase("My New Portfolio", "OOT", {date: "1994-02-16", value: 999.99});
         this.appendPortfolio("My Append Portfolio", this.state.appData["My New Portfolio"]);
         this.createAndAppendPortfolio("My Big Portfolio", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', '5d');
+        saveToLocalStorage(["My New Portfolio", "My Append Portfolio", "My Big Portfolio"], LOCALSTORAGE_PORTFOLIOS_NAME);
+
+        // Load array of portfolio names and all app data from local storage.
+        //Throws error if not found and fails silently outputting error only to console.
         try {
             const portfolios = loadFromLocalStorage(LOCALSTORAGE_PORTFOLIOS_NAME);  // Trows error if not found
-            //const appData = loadFromLocalStorage(LOCALSTORAGE_APPDATA_NAME);  // Trows error if not found
+            const appData = loadFromLocalStorage(LOCALSTORAGE_APPDATA_NAME);  // Trows error if not found
             this.setState(
-                { portfolios: portfolios },
-                () => console.log("==> Loaded 'portfolios' from local storage")
+                { portfolios: portfolios, appData: appData },
+                () => {
+                    console.log("==> Loaded 'portfolios' and 'appData' from local storage");
+                    console.log(this.state.appData)
+                }
             );
         }
         catch (error) {

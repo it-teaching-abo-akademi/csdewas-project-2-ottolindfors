@@ -14,7 +14,7 @@ function saver(obj, objName) {
     /*
     Saves an JSON object to local storage.
      */
-    let data = localStorage.setItem(objName, JSON.stringify(obj));
+    localStorage.setItem(objName, JSON.stringify(obj));
 }
 
 export const loadFromLocalStorage = (objName) => {
