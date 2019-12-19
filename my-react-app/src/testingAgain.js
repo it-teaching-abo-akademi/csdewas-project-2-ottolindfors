@@ -1,58 +1,51 @@
+/*
+A playground for testing arround in order to get the data from the API while keeping the App.js clean.
+ */
+
 import React from 'react';
 import './App.css';
 import {urlBuilder} from "./api";
-
-const LOCALSTORAGE_PORTFOLIOS_NAME = 'portfolios';
 
 class Portfolio extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            // stockSymbols: [],  // Input from 'add' button
-            stockSymbols: ['AAPL', 'FB', 'TWTR'],
-            data: {},
-            // chartRange: null,  // Input from select menu
-            chartRange: '5d',
+            // stockSymbols: [],
+            stockSymbols: ['AAPL', 'FB', 'TWTR'],  // Input from 'add' button
+            data: {},  // Latest data from today (quote) and historic data (chart)
+            // chartRange: null,
+            chartRange: '5d',  // Input from select menu
             error: null,
-            loading: false,
         };
     }
 
     savePortfolio(data) {
-        /*
-        Saves the portfolio (data) to local storage.
-         */
-        const portfolioName = this.props.name;
-        localStorage.setItem(portfolioName, JSON.stringify(data));
-        console.log("==> Saved portfolio '" + portfolioName + "' to local storage after fetching from api.");
+        localStorage.setItem(this.props.name, JSON.stringify(data));
+        console.log("==> Saved portfolio '" + this.props.name + "' to local storage after fetching from api.");
     }
 
     dataFetcher(stockSymbols, type, chartRange) {
         /*
-        Fetches latest quote and/or chart (historic data) for all stockSymbols.
+        Fetches latest quote for all stockSymbols
+        or
+        Fetches historic stock data (chart data) for all stockSymbols
          */
         const apiUrl = urlBuilder(stockSymbols, type, chartRange);
-        this.setState({ loading: true });  // For loading indicator
         fetch(apiUrl)
             .then(response => {
-                // "Parse" json
+                // Parse json
                 if (response.ok) { return response.json() }
                 else { throw new Error("Error while fetching from api...") }
             })
             .then(jsonData => {
                 // Extract data and save to local storage
-                this.setState(
-                    { data: jsonData, loading: false },
-                    () => this.savePortfolio(jsonData)
-                );
+                this.setState({ data: jsonData }, () => this.savePortfolio(jsonData));
             })
             .catch(error => this.setState({ error: error}));
     }
 
     componentDidMount() {
-        /*
-        Fetches stock data after component has mounted.
-         */
+        // Fetching stock data after component has mounted.
         const stockSymbols = this.state.stockSymbols;
         const chartRange = this.state.chartRange;
         this.dataFetcher(stockSymbols, 'quote,chart', chartRange);
@@ -63,9 +56,6 @@ class Portfolio extends React.Component {
         const error = this.state.error;
         if (error) { return <p>{error.message}</p> }
 
-        // Render indicator if loading
-        if (this.state.loading) { return <p>Loading ...</p> }
-
         // Render normally if no error
         return (
             <div>
@@ -75,34 +65,27 @@ class Portfolio extends React.Component {
     }
 }
 
-
-class App extends React.Component {
+class TestAgainApp extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            portfolios: [], // Input from 'Add Portfolio' button. ["Portfolio 0", "Portfolio 1", "Portfolio 2"]
+            portfolios: [], // Input from 'Add Portfolio' button. ["Portfolio 0", "Portfolio 1", "Portfolio 2"],
         };
     }
 
-    loadFromLocalStorage(objName) {
-        /*
-        Loads an JSON object from local storage. Throws error if not found (data=null)
-         */
-        let data = JSON.parse(localStorage.getItem(objName));
+    loadFromLocalStorage(key) {
+        let data = JSON.parse(localStorage.getItem(key));
         // Check if null
         if (!data) {
-            throw new Error("Did not find '" + objName + "' in local storage");
+            throw new Error("'" + key + "' not in local storage");
         }
         return data;
     }
 
     componentDidMount() {
-        /*
-        Load array of portfolio names from local storage.
-        Throws error if not found and fails silently outputting error only to console.
-         */
+        // Load array of portfolio names from local storage
         try {
-            const portfolios = this.loadFromLocalStorage(LOCALSTORAGE_PORTFOLIOS_NAME);  // Trows error if not found
+            let portfolios = this.loadFromLocalStorage('portfolios');  // Trows error if not found
             this.setState(
                 { portfolios: portfolios },
                 () => console.log("==> Loaded 'portfolios' from local storage")
@@ -114,9 +97,6 @@ class App extends React.Component {
     }
 
     render() {
-        const portfolios = this.state.portfolios;
-
-        // If not loading render portfolios
         return (
             <div className="App">
                 <h1>SPMS</h1>
@@ -128,4 +108,4 @@ class App extends React.Component {
     }
 }
 
-export default App;
+export default TestAgainApp;

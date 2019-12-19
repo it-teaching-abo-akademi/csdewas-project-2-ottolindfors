@@ -27,7 +27,7 @@ function builder(stockSymbols, type, chartRange) {
     // Append types to the url
     url += typ + type;
     // Append range to the url
-    if (type === 'chart') {
+    if (type.includes('chart')) {
         if (chartRange) { url += ran + chartRange }
         else { url += ran + fallbackRange }  // Use fallbackRange if no range was provided
     }
