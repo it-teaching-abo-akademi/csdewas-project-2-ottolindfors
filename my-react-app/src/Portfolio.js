@@ -1,45 +1,43 @@
 import React from "react";
 import {PortfolioTableRow} from "./PortfolioTableRow";
+import {EvolutionGraph} from "./EvolutionGraph";
 
 export class Portfolio extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            // stockSymbols: [],  // Input from 'add' button
-            stockSymbols: ['AAPL', 'FB', 'TWTR'],
-            data: {},
             // chartRange: null,  // Input from select menu
             chartRange: '5d',
-            error: null,
-            loading: false,
         };
     }
 
     render() {
-        console.log("==> Portfolio render");
-
+        // Props
         const name = this.props.name;
-        const portfolioData = this.props.portfolioData;
+        const stocks = this.props.portfolio.stocks;
+        const showInEuro = this.props.portfolio.userPrefs.showInEuro;
+
+        // Rows in the table
         let rows = [];
-        for (let key in portfolioData) {
-            if (portfolioData.hasOwnProperty(key)) {
+        for (let key in stocks) {
+            if (stocks.hasOwnProperty(key)) {
                 rows.push(
-                    <PortfolioTableRow key={key} stock={key} stockData={portfolioData[key]}/>
+                    <PortfolioTableRow key={key} stock={key} stockData={stocks[key]} showInEuro={showInEuro}/>
                 );
             }
         }
 
-        // Render error if any
-        const error = this.state.error;
-        if (error) { return <p>{error.message}</p> }
+        // For handling button press read https://reactjs.org/docs/handling-events.html
 
-        // Render indicator if loading
-        if (this.state.loading) { return <p>Loading ...</p> }
-
-        // Render normally if no error
         return (
             <div>
                 <h2>{name}</h2>
+                <button>
+                    {this.state.showInEuro ? "USD" : "EUR" }
+                </button>
+                <EvolutionGraph />
+                <button>Add stock</button>
+                <button>Remove selected stocks</button>
                 <table>
                     <thead>
                         <tr>
@@ -53,6 +51,7 @@ export class Portfolio extends React.Component {
                     </thead>
                     <tbody>{rows}</tbody>
                 </table>
+                <button>Remove portfolio</button>
             </div>
         );
     }
