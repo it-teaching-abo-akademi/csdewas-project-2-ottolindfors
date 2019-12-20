@@ -171,7 +171,7 @@ class App extends React.Component {
                 // Add dummy purchase data
                 for (let key in portfolioData) {
                     if (portfolioData.hasOwnProperty(key)) {
-                        portfolioData[key]["purchase"] = {date: "1970-01-01", price: 10.00, shares: 10};
+                        portfolioData[key]["purchase"] = {date: "1970-01-01", price: 10.00, shares: 7};
                     }
                 }
                 // Add portfolio to appData

@@ -1,4 +1,5 @@
 import React from "react";
+import {PortfolioTableRow} from "./PortfolioTableRow";
 
 export class Portfolio extends React.Component {
     constructor(props) {
@@ -22,19 +23,8 @@ export class Portfolio extends React.Component {
         let rows = [];
         for (let key in portfolioData) {
             if (portfolioData.hasOwnProperty(key)) {
-                console.log("==> HELLO:", portfolioData);
-                const latestPrice = portfolioData[key].quote.latestPrice;
-                const shares = portfolioData[key]["purchase"].shares;
-                const purchasePrice = portfolioData[key]["purchase"].price;
                 rows.push(
-                    <tr key={key}>
-                        <td>{key}</td>
-                        <td>{latestPrice}</td>
-                        <td>{purchasePrice}</td>
-                        <td>{shares}</td>
-                        <td>{String((latestPrice * shares).toFixed(2))}</td>
-                        <td>Select button</td>
-                    </tr>
+                    <PortfolioTableRow key={key} stock={key} stockData={portfolioData[key]}/>
                 );
             }
         }
