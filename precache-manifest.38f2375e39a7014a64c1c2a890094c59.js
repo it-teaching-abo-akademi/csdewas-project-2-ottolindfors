@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "41801f7e35ac9fc7789b1ea66dcff2c6",
+    "revision": "b5a4fcf2e137211a253dbed3c170dffd",
     "url": "/csdewas-project-2-ottolindfors/index.html"
   },
   {
-    "revision": "fb993a39ce10850c3be6",
+    "revision": "2247ed0b6ce9bb0e411c",
     "url": "/csdewas-project-2-ottolindfors/static/css/main.5facb584.chunk.css"
   },
   {
-    "revision": "d1703e4adffb72beedda",
-    "url": "/csdewas-project-2-ottolindfors/static/js/2.db48f7d5.chunk.js"
+    "revision": "c381e7d3a31ed166afd7",
+    "url": "/csdewas-project-2-ottolindfors/static/js/2.1311d20c.chunk.js"
   },
   {
     "revision": "d705cb622423d72c5defbf368ca70dcc",
-    "url": "/csdewas-project-2-ottolindfors/static/js/2.db48f7d5.chunk.js.LICENSE"
+    "url": "/csdewas-project-2-ottolindfors/static/js/2.1311d20c.chunk.js.LICENSE"
   },
   {
-    "revision": "fb993a39ce10850c3be6",
-    "url": "/csdewas-project-2-ottolindfors/static/js/main.eb7b164d.chunk.js"
+    "revision": "2247ed0b6ce9bb0e411c",
+    "url": "/csdewas-project-2-ottolindfors/static/js/main.5e896e1f.chunk.js"
   },
   {
     "revision": "65c0ae49ffbae837e0e5",
