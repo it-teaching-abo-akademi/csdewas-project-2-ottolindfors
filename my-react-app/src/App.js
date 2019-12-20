@@ -41,7 +41,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            portfolios: [], // Input from 'Add Portfolio' button. ["Portfolio 0", "Portfolio 1", "Portfolio 2"]
+            portfolios: [], // Should maybe not be used as it can be derived from appData. Input from 'Add Portfolio' button. ["Portfolio 0", "Portfolio 1", "Portfolio 2"]
             appData: {},  // All data
         };
     }
@@ -60,12 +60,10 @@ class App extends React.Component {
             })
             .then(jsonData => {
                 // Extract data and save to local storage
-                console.log(jsonData);
                 return jsonData;
             })
             .catch(error => this.setState({error: error}));
     }
-
     // Add individual elements to the appData state
     addEmptyPortfolio(newPortfolioName) {
         // Get appData from state
@@ -233,7 +231,7 @@ class App extends React.Component {
                 { portfolios: portfolios, appData: appData },
                 () => {
                     console.log("==> Loaded 'portfolios' and 'appData' from local storage");
-                    console.log(this.state.appData)
+                    console.log("==> appData:", this.state.appData)
                 }
             );
         }
@@ -243,13 +241,21 @@ class App extends React.Component {
     }
 
     render() {
-        // Render portfolios
-        console.log("appData: ", this.state.appData);
+        // Get list of portfolios from appData
+        const appData = this.state.appData;
+        let portfolios = [];
+        for (let portfolio in appData) {
+            if (appData.hasOwnProperty(portfolio)) {
+                portfolios.push(portfolio);
+            }
+        }
+
+        // Render portfolios. Pass portfolio data and name
         return (
             <div className="App">
                 <h1>SPMS</h1>
-                {this.state.portfolios.map(portfolio =>
-                    <Portfolio key={portfolio} name={portfolio}/>
+                {portfolios.map(portfolio =>
+                    <Portfolio key={portfolio} name={portfolio} portfolioData={appData[portfolio]}/>
                 )}
             </div>
         );
