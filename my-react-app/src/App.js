@@ -2,40 +2,11 @@ import React from 'react';
 import './App.css';
 import {urlBuilder} from "./api";
 import {loadFromLocalStorage, saveToLocalStorage} from "./myFunctions";
+import {AddPortfolioButton} from './AddPortfolioButton'
+import {Portfolio} from "./Portfolio";
 
 const LOCALSTORAGE_PORTFOLIOS_NAME = 'portfolios';
 const LOCALSTORAGE_APPDATA_NAME = 'appData';
-
-class Portfolio extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            // stockSymbols: [],  // Input from 'add' button
-            stockSymbols: ['AAPL', 'FB', 'TWTR'],
-            data: {},
-            // chartRange: null,  // Input from select menu
-            chartRange: '5d',
-            error: null,
-            loading: false,
-        };
-    }
-
-    render() {
-        // Render error if any
-        const error = this.state.error;
-        if (error) { return <p>{error.message}</p> }
-
-        // Render indicator if loading
-        if (this.state.loading) { return <p>Loading ...</p> }
-
-        // Render normally if no error
-        return (
-            <div>
-                <p>{this.props.name}</p>
-            </div>
-        );
-    }
-}
 
 class App extends React.Component {
     constructor(props) {
@@ -64,7 +35,8 @@ class App extends React.Component {
             })
             .catch(error => this.setState({error: error}));
     }
-    // Add individual elements to the appData state
+
+    // *** METHODS TO MANIPULATE THE STATE ***
     addEmptyPortfolio(newPortfolioName) {
         // Get appData from state
         let appData = this.state.appData;
@@ -169,7 +141,7 @@ class App extends React.Component {
         let appData = this.state.appData[toPortfolio];
         for (let key in appData) {
             if (appData.hasOwnProperty(key)) {
-                const dummy = {date: "1970-01-01", open: 10.00};
+                const dummy = {date: "1970-01-01", price: 10.00, shares: 10};
                 this.addPurchase(toPortfolio, key, dummy)
             }
         }
@@ -189,15 +161,30 @@ class App extends React.Component {
                 saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);            }
         );
     }
+
     // Create and append a whole portfolio at once (with dummy 'purchase' element) to the appData state
     createAndAppendPortfolio(newPortfolioName, stockSymbols, type, chartRange) {
         // dataFetcher uses fetch() so it returns a promise. Therefore newPortfolio.then() to access the result value.
         const newPortfolio = this.dataFetcher(stockSymbols, type, chartRange);
-        newPortfolio.then(value =>
+        newPortfolio.then(portfolioData =>
             {
-                this.appendPortfolio(newPortfolioName, value);
-                // Remove next line to remove dummy purchase values
-                this.addDummyPurchase(newPortfolioName)
+                // Add dummy purchase data
+                for (let key in portfolioData) {
+                    if (portfolioData.hasOwnProperty(key)) {
+                        portfolioData[key]["purchase"] = {date: "1970-01-01", price: 10.00, shares: 10};
+                    }
+                }
+                // Add portfolio to appData
+                let appData = this.state.appData;
+                appData[newPortfolioName] = portfolioData;
+                // Set state
+                this.setState(
+                    { appData: appData },
+                    () => {
+                        console.log("==> Data fetched, dummy purchase data added");
+                        saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+                    }
+                )
             }
         );
     }
@@ -211,6 +198,7 @@ class App extends React.Component {
 
         // *** CREATE DUMMY DATA. DO NOT USE IN PRODUCTION ***
         console.log("==> Creating dummy data: ");
+        /*
         this.addEmptyPortfolio("My New Portfolio");
         this.addEmptyStock("My New Portfolio", "OOT");
         this.addEmptyChart("My New Portfolio", "OOT");
@@ -219,8 +207,10 @@ class App extends React.Component {
         this.addQuote("My New Portfolio", "OOT", {date: "1994-03-16", latestPrice: 29.99});
         this.addPurchase("My New Portfolio", "OOT", {date: "1994-02-16", value: 999.99});
         this.appendPortfolio("My Append Portfolio", this.state.appData["My New Portfolio"]);
+         */
         this.createAndAppendPortfolio("My Big Portfolio", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', '5d');
-        saveToLocalStorage(["My New Portfolio", "My Append Portfolio", "My Big Portfolio"], LOCALSTORAGE_PORTFOLIOS_NAME);
+        this.createAndAppendPortfolio("My Big Portfolio 2", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', '5d');
+        this.createAndAppendPortfolio("My Big Portfolio 3", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', '5d');
 
         // Load array of portfolio names and all app data from local storage.
         //Throws error if not found and fails silently outputting error only to console.
@@ -241,6 +231,7 @@ class App extends React.Component {
     }
 
     render() {
+        console.log("==> App render");
         // Get list of portfolios from appData
         const appData = this.state.appData;
         let portfolios = [];
@@ -250,11 +241,15 @@ class App extends React.Component {
             }
         }
 
-        // Render portfolios. Pass portfolio data and name
+        // Render portfolios and 'add portfolio' button
         return (
             <div className="App">
                 <h1>SPMS</h1>
+                <a href="https://iexcloud.io">Data provided by IEX Cloud</a>
+                <p>15 minute delay in price</p>
+                <AddPortfolioButton />
                 {portfolios.map(portfolio =>
+                    // Pass portfolio name and portfolio data to the portfolio
                     <Portfolio key={portfolio} name={portfolio} portfolioData={appData[portfolio]}/>
                 )}
             </div>
