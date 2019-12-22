@@ -2,30 +2,55 @@ import React from "react";
 import {LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line, ResponsiveContainer} from "recharts";
 
 export class EvolutionGraph extends React.PureComponent{
+
+    generateHslColor() {
+        // Generate random hsl color. Ensures the color is visible on the chart
+        const hue = (Math.random() * 360).toFixed(0).toString();
+        const saturation = "40%";
+        const lightness = "70%";
+        return "hsl(" + hue + "," + saturation + "," + lightness + ")";
+    }
+
     render() {
-        const data = [
-            {
-                name: 'STOCK A', uv: 4000, pv: 2400, amt: 2400,
-            },
-            {
-                name: 'STOCK B', uv: 3000, pv: 1398, amt: 2210,
-            },
-            {
-                name: 'STOCK C', uv: 2000, pv: 9800, amt: 2290,
-            },
-            {
-                name: 'STOCK D', uv: 2780, pv: 3908, amt: 2000,
-            },
-            {
-                name: 'STOCK E', uv: 1890, pv: 4800, amt: 2181,
-            },
-            {
-                name: 'STOCK F', uv: 2390, pv: 3800, amt: 2500,
-            },
-            {
-                name: 'STOCK G', uv: 6490, pv: 4300, amt: 2100,
-            },
-        ];
+        const data = [];
+        const stocks = this.props.stocks;
+
+        for (let stock in stocks) {  // stock = aapl, fb, ...
+            // Extract data
+            if (stocks.hasOwnProperty(stock)) {
+                const chart = stocks[stock].chart;
+
+                for (let key in chart) {  // key = 0, 1, 2, ...
+                    if (chart.hasOwnProperty(key)) {
+                        const date = chart[key].date;
+                        const close = chart[key].close;
+
+                        if (key in data) {
+                            // Update existing entry
+                            const dataEntry = data[key];
+                            dataEntry[stock] = close;  // { name: "2019-12-16", FB: 205.12 }
+                            data[key] = dataEntry;
+                        }
+                        else {
+                            // Create new entry
+                            const dataEntry = {};
+                            dataEntry["name"] = date;
+                            dataEntry[stock] = close;  // { name: "2019-12-16", FB: 205.12 }
+                            data.push(dataEntry);  // [{ name: "2019-12-16", FB: 205.12 }, { name: "2019-12-16", FB: 205.12 }, ...]
+                        }
+
+                    }
+                }
+
+            }
+        }
+
+        let stockNames = [];
+        for (let stockName in stocks) {
+            if (stocks.hasOwnProperty(stockName)) {
+                stockNames.push(stockName);
+            }
+        }
 
         return (
             // Responsive container makes the chart adapt to the sise of the parent container
@@ -37,8 +62,17 @@ export class EvolutionGraph extends React.PureComponent{
                         <YAxis/>
                         <Tooltip/>
                         <Legend/>
-                        <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 6 }}/>
-                        <Line type="monotone" dataKey="uv" stroke="#82ca9d" activeDot={{ r: 6 }}/>
+                        {stockNames.map(stockName =>
+                            <Line
+                                key={stockName}
+                                type="monotone"
+                                dataKey={stockName}
+                                stroke={this.generateHslColor()}
+                                activeDot={{ r: 4 }}
+                                dot={false}
+                            />
+                            )
+                        }
                     </LineChart>
                 </ResponsiveContainer>
             </div>

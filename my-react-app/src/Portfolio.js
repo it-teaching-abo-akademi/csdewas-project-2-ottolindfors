@@ -2,6 +2,18 @@ import React from "react";
 import {PortfolioTableRow} from "./PortfolioTableRow";
 import {EvolutionGraph} from "./EvolutionGraph";
 
+const rangeOptions = [
+    {value: "5d", text: "5 days"},
+    {value: "1m", text: "1 month"},
+    {value: "3m", text: "3 months"},
+    {value: "6m", text: "6 months"},
+    {value: "ytd", text: "This year"},
+    {value: "1y", text: "1 year"},
+    {value: "2y", text: "2 years"},
+    {value: "5y", text: "5 years"},
+    {value: "max", text: "Maximum available"}
+];
+
 export class Portfolio extends React.Component {
     constructor(props) {
         super(props);
@@ -22,12 +34,13 @@ export class Portfolio extends React.Component {
         for (let key in stocks) {
             if (stocks.hasOwnProperty(key)) {
                 rows.push(
-                    <PortfolioTableRow key={key} stock={key} stockData={stocks[key]} showInEuro={showInEuro}/>
+                    <PortfolioTableRow key={key} stock={key} stockInfo={stocks[key]} showInEuro={showInEuro}/>
                 );
             }
         }
 
         // For handling button press read https://reactjs.org/docs/handling-events.html
+        //<SelectRangeButton />
 
         return (
             <div>
@@ -35,7 +48,14 @@ export class Portfolio extends React.Component {
                 <button>
                     {this.state.showInEuro ? "USD" : "EUR" }
                 </button>
-                <EvolutionGraph />
+                <div>
+                    <EvolutionGraph stocks={stocks} />
+                    <select>
+                        {rangeOptions.map(entry => {
+                            return <option key={entry.value} value={entry.value}>{entry.text}</option>
+                        })}
+                    </select>
+                </div>
                 <button>Add stock</button>
                 <button>Remove selected stocks</button>
                 <table>

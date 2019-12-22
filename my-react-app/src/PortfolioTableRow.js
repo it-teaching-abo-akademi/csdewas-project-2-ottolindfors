@@ -2,7 +2,7 @@ import React from "react";
 export class PortfolioTableRow extends React.Component{
     render() {
         const stock = this.props.stock;
-        const stockData = this.props.stockData;
+        const stockData = this.props.stockInfo;
         const showInEuro = this.props.showInEuro;
         const latestPrice = stockData.quote.latestPrice;
         const shares = stockData.purchase.shares;

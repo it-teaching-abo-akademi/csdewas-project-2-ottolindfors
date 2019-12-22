@@ -145,8 +145,11 @@ class App extends React.Component {
             }
         }
     }
-    // Append a whole existing portfolio at once to the appData state
+
     appendPortfolio(newPortfolioName, existingPortfolioContent) {
+        /*
+        Append a whole existing portfolio at once to the appData state
+         */
         // Get appData from state
         let appData = this.state.appData;
         // Add empty portfolio to appData
@@ -161,8 +164,10 @@ class App extends React.Component {
         );
     }
 
-    // Create and append a whole portfolio at once (with dummy 'purchase' element) to the appData state
     createAndAppendDummyPortfolio(newPortfolioName, stockSymbols, type, chartRange) {
+        /*
+        Creates and appends a whole portfolio at once (with dummy 'purchase' element) to the appData state
+        */
         console.log("==> Creating dummy portfolio '" + newPortfolioName + "'");
         // dataFetcher uses fetch() so it returns a promise. Therefore newPortfolio.then() to access the result value.
         const newPortfolio = this.dataFetcher(stockSymbols, type, chartRange);
@@ -191,31 +196,45 @@ class App extends React.Component {
         );
     }
 
-    // Load data from local storage if avalible
+    refreshPortfolio(portfolioName) {
+        /*
+        Refresh portfolio data (called on button press)
+        */
+        console.log("==> Refreshing portfolio data '" + portfolioName + "'");
+
+        // Copy current portfolio
+        let appData = this.state.appData;
+
+        const stockSymbols = Object.keys(appData[portfolioName].stocks);
+        const type = "quote,chart";  // These are the types the application always and only show
+        const chartRange = "5d";  // Later improvement to only fetch the missing data to save loading time and server time (power)
+
+        let newStockData = this.dataFetcher(stockSymbols, type, chartRange);
+        newStockData.then(stockData => {
+            for (let stock in stockData) {
+                if (stockData.hasOwnProperty(stock)) {
+                    // Overwrite old stock data
+                    appData[portfolioName].stocks[stock].chart = stockData[stock].chart;
+                }
+            }
+            console.log("==> Refreshed portfolio:" , appData[portfolioName]);
+            this.setState(
+                { appData: appData },
+                () => {
+                    console.log("==> Set state with newStockData and range 5d !!!!!!!!!!!!!!!!");
+                    saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+                }
+            );
+        });
+    }
+
     componentDidMount() {
         /*
         FIRST TRY LOADING DATA FROM LOCAL STORAGE.
         IF THERE IS NOTHING IN LOCAL STORAGE THEN LOAD FROM INTERNET (BUT ONLY ON USER INPUT REFRESH/GET/ADD BUTTON)
          */
 
-        // *** CREATE DUMMY DATA. DO NOT USE IN PRODUCTION ***
-        console.log("==> Creating dummy data");
-        /*
-        this.addEmptyPortfolio("My New Portfolio");
-        this.addEmptyStock("My New Portfolio", "OOT");
-        this.addEmptyChart("My New Portfolio", "OOT");
-        this.addChartElement("My New Portfolio", "OOT", {date: "1994-02-16", open: 29.99});
-        this.addChartElement("My New Portfolio", "OOT", {date: "1994-03-16", open: 29.99});
-        this.addQuote("My New Portfolio", "OOT", {date: "1994-03-16", latestPrice: 29.99});
-        this.addPurchase("My New Portfolio", "OOT", {date: "1994-02-16", value: 999.99});
-        this.appendPortfolio("My Append Portfolio", this.state.appData["My New Portfolio"]);
-         */
-        this.createAndAppendDummyPortfolio("My Big Portfolio", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', '5d');
-        this.createAndAppendDummyPortfolio("My Big Portfolio 2", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', '5d');
-        this.createAndAppendDummyPortfolio("My Big Portfolio 3", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', '5d');
-
-        // Load array of portfolio names and all app data from local storage.
-        //Throws error if not found and fails silently outputting error only to console.
+        // Load array of portfolio names and all app data from local storage. Throws error if not found and fails silently outputting error only to console.
         try {
             const appData = loadFromLocalStorage(LOCALSTORAGE_APPDATA_NAME);  // Trows error if not found
             this.setState(
@@ -228,6 +247,11 @@ class App extends React.Component {
         }
         catch (error) {
             console.log("==>", error);
+            // *** CREATE DUMMY DATA. DO NOT USE IN PRODUCTION ***
+            console.log("==> Creating dummy data");
+            this.createAndAppendDummyPortfolio("My Big Portfolio", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', 'max');
+            this.createAndAppendDummyPortfolio("My Big Portfolio 2", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', 'max');
+            this.createAndAppendDummyPortfolio("My Big Portfolio 3", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', 'max');
         }
     }
 
