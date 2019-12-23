@@ -1,5 +1,6 @@
 const TOKEN = 'Tpk_391653b184fb45f2a8e9b1270c0306e9';
 const BASE_URL = 'https://sandbox.iexapis.com/stable/stock/market/batch?';
+const BASE_URL_DATE = 'https://sandbox.iexapis.com/stable/stock/';
 
 function builder(stockSymbols, type, chartRange) {
     /*
@@ -37,6 +38,25 @@ function builder(stockSymbols, type, chartRange) {
     return url;
 }
 
+function builderDate(stockSymbol, yyyymmdd) {
+    /*
+    Builds an url for fetching stock price at a specific date.
+     */
+    let url = BASE_URL_DATE;
+
+    url += stockSymbol;
+    url += '/chart/date/';
+    url += yyyymmdd;
+    url += '?chartByDay=true&token=';
+    url += TOKEN;
+
+    return(url)
+}
+
 export const urlBuilder = (stockSymbols, type, chartRange) => {
   return builder(stockSymbols, type, chartRange);
+};
+
+export const urlBuilderDate = (stockSymbol, yyyymmdd) => {
+    return builderDate(stockSymbol, yyyymmdd);
 };

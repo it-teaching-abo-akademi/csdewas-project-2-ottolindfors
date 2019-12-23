@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import {urlBuilder} from "./api";
+import {urlBuilder, urlBuilderDate} from "./api";
 import {loadFromLocalStorage, saveToLocalStorage} from "./myFunctions";
 import {AddPortfolioButton} from './AddPortfolioButton'
 import {Portfolio} from "./Portfolio";
@@ -34,133 +34,21 @@ class App extends React.Component {
             .catch(error => this.setState({error: error}));
     }
 
-    // *** METHODS TO MANIPULATE THE STATE ***
-    addEmptyPortfolio(newPortfolioName) {
-        // Get appData from state
-        let appData = this.state.appData;
-        // Add empty portfolio to appData
-        appData[newPortfolioName] = {};
-        // Set new state
-        this.setState(
-            { appData: appData },
-            () => {
-                console.log("==> new empty portfolio added");
-                console.log("==> Saving to local storage");
-                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
-            }
-            );
-    }
-    addEmptyStock(toPortfolio, newStockName) {
-        // Get appData from state
-        let appData = this.state.appData;
-        // Add empty stock to portfolio
-        appData[toPortfolio][newStockName] = {};
-        // Set new state
-        this.setState(
-            { appData: appData },
-            () => {
-                console.log("==> new empty stock added");
-                console.log("==> Saving to local storage");
-                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
-            }
-        );
-    }
-    addEmptyChart(toPortfolio, toStock) {
-        // Get appData from state
-        let appData = this.state.appData;
-        // Add empty chart to stock
-        appData[toPortfolio][toStock]["chart"] = [];
-        // Set new state
-        this.setState(
-            { appData: appData },
-            () => {
-                console.log("==> new empty chart added");
-                console.log("==> Saving to local storage");
-                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
-            }
-        );
-    }
-    addChartElement(toPortfolio, toStock, newObjectWithData) {
-        /*
-        newObjectWithData should be like {date: "1994-02-16", open: 29.99, ...}
-         */
-        // Get appData from state
-        let appData = this.state.appData;
-        // Add element to chart
-        appData[toPortfolio][toStock]["chart"].push(newObjectWithData);
-        // Set new state
-        this.setState(
-            { appData: appData },
-            () => {
-                console.log("==> new chart element added");
-                console.log("==> Saving to local storage");
-                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
-            }
-        );
-    }
-    addQuote(toPortfolio, toStock, newObjectWithData) {
-        /*
-        newObjectWithData should be like {date: "1994-02-16", open: 29.99, ...}
-         */
-        // Get appData from state
-        let appData = this.state.appData;
-        // Add empty quote to stock
-        appData[toPortfolio][toStock]["quote"] = newObjectWithData;
-        // Set new state
-        this.setState(
-            { appData: appData },
-            () => {
-                console.log("==> new quote added");
-                console.log("==> Saving to local storage");
-                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
-            }
-        );
-    }
-    addPurchase(toPortfolio, toStock, newObjectWithData) {
-        /*
-        newObjectWithData should be like {date: "1994-02-16", price: 29.99}
-         */
-        // Get appData from state
-        let appData = this.state.appData;
-        // Add purchase info to stock
-        appData[toPortfolio][toStock]["purchase"] = newObjectWithData;
-        // Set new state
-        this.setState(
-            { appData: appData },
-            () => {
-                console.log("==> new purchase added");
-                console.log("==> Saving to local storage");
-                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
-            }
-        );
-    }
-    addDummyPurchase(toPortfolio) {
-        // Get appData from state
-        let appData = this.state.appData[toPortfolio];
-        for (let key in appData) {
-            if (appData.hasOwnProperty(key)) {
-                const dummy = {date: "1970-01-01", price: 10.00, shares: 10};
-                this.addPurchase(toPortfolio, key, dummy)
-            }
-        }
-    }
-
-    appendPortfolio(newPortfolioName, existingPortfolioContent) {
-        /*
-        Append a whole existing portfolio at once to the appData state
-         */
-        // Get appData from state
-        let appData = this.state.appData;
-        // Add empty portfolio to appData
-        appData[newPortfolioName] = existingPortfolioContent;
-        // Set new state
-        this.setState(
-            { appData: appData },
-            () => {
-                console.log("==> appended portfolio");
-                console.log("==> Saving to local storage");
-                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);            }
-        );
+    puchasePriceFetcher(stockSymbol, yyyymmdd) {
+        const apiUrl = urlBuilderDate(stockSymbol, yyyymmdd);
+        return fetch(apiUrl)
+            .then(response => {
+                // "Parse" json
+                if (response.ok) {
+                    return response.json()
+                } else {
+                    throw new Error("Error while fetching from api...")
+                }
+            })
+            .then(jsonData => {
+                return jsonData[0].close;
+            })
+            .catch(error => this.setState({error: error}));
     }
 
     createAndAppendDummyPortfolio(newPortfolioName, stockSymbols, type, chartRange) {
