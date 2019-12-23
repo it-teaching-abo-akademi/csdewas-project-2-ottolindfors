@@ -182,8 +182,8 @@ class App extends React.Component {
                 // Add portfolio to appData
                 let appData = this.state.appData;
                 appData[newPortfolioName] = {"stocks": stockData};
-                // Add currency preference
-                appData[newPortfolioName]["userPrefs"] = {showInEuro: false};
+                // Add currency and graph visualisation range preference
+                appData[newPortfolioName]["userPrefs"] = {showInEuro: false, graphRange: "6m"};
                 // Set state
                 this.setState(
                     { appData: appData },

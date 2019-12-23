@@ -11,44 +11,82 @@ export class EvolutionGraph extends React.PureComponent{
         return "hsl(" + hue + "," + saturation + "," + lightness + ")";
     }
 
+    graphRangeToDate(graphRange) {
+        // graphRange options are 5d, 1m, 3m, 6m, ytd, 1y, 2y, 5y, max
+        if (graphRange.includes("d")) {
+            const days = graphRange.replace("d", "");
+            const dateToday = new Date();
+            // Set the date to 'days' number of days in the past and return the new date
+            return new Date(new Date().setDate(dateToday.getDate() - days));
+        }
+        if (graphRange.includes("m")) {
+            const months = graphRange.replace("m", "");  // 1m, 3m, 6m
+            const dateToday = new Date();
+            // Set the date to 'months' number of months in the past and return the new date
+            return new Date(new Date().setMonth(dateToday.getMonth() - months));
+        }
+        if (graphRange.includes('ytd')) {
+            // Return a Date object set to 1 Jan of the current year
+            return new Date(new Date().toISOString().slice(0,4));  // new Date("2019") returns 1 Jan 2019
+        }
+        if (graphRange.includes("y")) {
+            const years = graphRange.replace("y", "");
+            const dateToday = new Date();
+            // Set the date to 'years' number of years in the past and return the new date
+            return new Date(new Date().setFullYear(dateToday.getFullYear() - years));
+        }
+        if (graphRange.includes('max')) {
+            const years = 500;
+            const dateToday = new Date();
+            // Set the date 500 years in the past and return the new date
+            return new Date(new Date().setFullYear(dateToday.getFullYear() - years));
+        }
+    }
+
     render() {
-        const data = [];
         const stocks = this.props.stocks;
+        const graphRange = this.props.graphRange;
 
+        const data = [];
+        let stockNames = [];
+
+        // const dateToday = new Date(new Date().toISOString().slice(0,10));
+        // const oneDayInMS = 24 * 60 * 60 * 1000;  // number of milliseconds in one day (24 hrs)
+
+        // Translate 'graphRange' to number of days
+        const graphRangeLimitDate = this.graphRangeToDate(graphRange);
+
+        // Populate 'data' and 'stockNames' with data in the correct format for the LineChart component
         for (let stock in stocks) {  // stock = aapl, fb, ...
-            // Extract data
             if (stocks.hasOwnProperty(stock)) {
+                stockNames.push(stock);
+
                 const chart = stocks[stock].chart;
+                let dataKey = 0;
+                for (let chartKey in chart) {  // key = 0, 1, 2, ...
+                    if (chart.hasOwnProperty(chartKey)) {
+                        const date = chart[chartKey].date;
+                        const close = chart[chartKey].close;
 
-                for (let key in chart) {  // key = 0, 1, 2, ...
-                    if (chart.hasOwnProperty(key)) {
-                        const date = chart[key].date;
-                        const close = chart[key].close;
-
-                        if (key in data) {
-                            // Update existing entry
-                            const dataEntry = data[key];
-                            dataEntry[stock] = close;  // { name: "2019-12-16", FB: 205.12 }
-                            data[key] = dataEntry;
+                        // Filter the dates for the graph (LineChart)
+                        if (new Date(date) >= graphRangeLimitDate) {
+                            if (dataKey in data) {
+                                // Add another stock's close value to existing entry (created in previous iterations)
+                                const dataEntry = data[dataKey];
+                                dataEntry[stock] = close;  // { name: "2019-12-16", FB: 205.12, AAPL: 123.45 }
+                                data[dataKey] = dataEntry;
+                            }
+                            else {
+                                // Create new entry. Add first stock's close value
+                                const dataEntry = {};
+                                dataEntry["name"] = date;
+                                dataEntry[stock] = close;  // { name: "2019-12-16", FB: 205.12 }
+                                data.push(dataEntry);  // [{ name: "2019-12-16", FB: 205.12 }, { name: "2019-12-16", FB: 205.12 }, ...]
+                            }
+                            dataKey++;
                         }
-                        else {
-                            // Create new entry
-                            const dataEntry = {};
-                            dataEntry["name"] = date;
-                            dataEntry[stock] = close;  // { name: "2019-12-16", FB: 205.12 }
-                            data.push(dataEntry);  // [{ name: "2019-12-16", FB: 205.12 }, { name: "2019-12-16", FB: 205.12 }, ...]
-                        }
-
                     }
                 }
-
-            }
-        }
-
-        let stockNames = [];
-        for (let stockName in stocks) {
-            if (stocks.hasOwnProperty(stockName)) {
-                stockNames.push(stockName);
             }
         }
 

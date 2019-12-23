@@ -3,7 +3,7 @@ import {PortfolioTableRow} from "./PortfolioTableRow";
 import {EvolutionGraph} from "./EvolutionGraph";
 
 const rangeOptions = [
-    {value: "5d", text: "5 days"},
+    {value: "5d", text: "5 days",},
     {value: "1m", text: "1 month"},
     {value: "3m", text: "3 months"},
     {value: "6m", text: "6 months"},
@@ -15,19 +15,22 @@ const rangeOptions = [
 ];
 
 export class Portfolio extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            // chartRange: null,  // Input from select menu
-            chartRange: '5d',
-        };
-    }
-
     render() {
         // Props
         const name = this.props.name;
         const stocks = this.props.portfolio.stocks;
         const showInEuro = this.props.portfolio.userPrefs.showInEuro;
+        const graphRange = this.props.portfolio.userPrefs.graphRange;
+
+        /*
+        const arrayRange = (start, stop) => {
+            return Array((stop - start + 1)).fill().map((item, idx) => stop - idx);
+        };
+        const yearOptions = arrayRange( 1970, new Date().getFullYear());
+        const monthOptions = arrayRange(1, 12);
+        const dayOptions = arrayRange(1, 31);
+        */
+
 
         // Rows in the table
         let rows = [];
@@ -40,19 +43,18 @@ export class Portfolio extends React.Component {
         }
 
         // For handling button press read https://reactjs.org/docs/handling-events.html
-        //<SelectRangeButton />
 
         return (
             <div>
                 <h2>{name}</h2>
                 <button>
-                    {this.state.showInEuro ? "USD" : "EUR" }
+                    {showInEuro ? "USD" : "EUR" }
                 </button>
                 <div>
-                    <EvolutionGraph stocks={stocks} />
-                    <select>
+                    <EvolutionGraph stocks={stocks} graphRange={graphRange}/>
+                    <select defaultValue={graphRange}>
                         {rangeOptions.map(entry => {
-                            return <option key={entry.value} value={entry.value}>{entry.text}</option>
+                            return <option key={entry.value} value={entry.value}>{entry.value}</option>
                         })}
                     </select>
                 </div>
