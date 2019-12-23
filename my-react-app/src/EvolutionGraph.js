@@ -46,12 +46,11 @@ export class EvolutionGraph extends React.PureComponent{
     render() {
         const stocks = this.props.stocks;
         const graphRange = this.props.graphRange;
+        const showInEuro = this.props.showInEuro;
+        const euroPerUsd = this.props.euroPerUsd;
 
         const data = [];
         let stockNames = [];
-
-        // const dateToday = new Date(new Date().toISOString().slice(0,10));
-        // const oneDayInMS = 24 * 60 * 60 * 1000;  // number of milliseconds in one day (24 hrs)
 
         // Translate 'graphRange' to number of days
         const graphRangeLimitDate = this.graphRangeToDate(graphRange);
@@ -66,7 +65,14 @@ export class EvolutionGraph extends React.PureComponent{
                 for (let chartKey in chart) {  // key = 0, 1, 2, ...
                     if (chart.hasOwnProperty(chartKey)) {
                         const date = chart[chartKey].date;
-                        const close = chart[chartKey].close;
+                        let close = 0;
+                        if (showInEuro) {
+                            close = Number((chart[chartKey].close * euroPerUsd).toFixed(2));  // .toFixed(2) without casting to Number causes the chart to scale incorrectly (if there are problems in the future).
+                        }
+                        else {
+                            close = chart[chartKey].close
+                        }
+
 
                         // Filter the dates for the graph (LineChart)
                         if (new Date(date) >= graphRangeLimitDate) {

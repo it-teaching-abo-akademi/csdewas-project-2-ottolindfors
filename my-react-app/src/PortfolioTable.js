@@ -12,12 +12,13 @@ export class PortfolioTable extends React.Component {
     render() {
         const stocks = this.props.stocks;
         const showInEuro = this.props.showInEuro;
+        const euroPerUsd = this.props.euroPerUsd;
 
         let rows = [];
         for (let key in stocks) {
             if (stocks.hasOwnProperty(key)) {
                 rows.push(
-                    <PortfolioTableRow key={key} stock={key} stockInfo={stocks[key]} showInEuro={showInEuro}/>
+                    <PortfolioTableRow key={key} stock={key} stockInfo={stocks[key]} showInEuro={showInEuro} euroPerUsd={euroPerUsd}/>
                 );
             }
         }

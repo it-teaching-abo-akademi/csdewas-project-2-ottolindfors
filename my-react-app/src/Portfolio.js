@@ -1,5 +1,4 @@
 import React from "react";
-import {PortfolioTableRow} from "./PortfolioTableRow";
 import {EvolutionGraph} from "./EvolutionGraph";
 import {PortfolioTable} from "./PortfolioTable";
 
@@ -34,7 +33,7 @@ export class Portfolio extends React.Component {
                     {showInEuro ? "USD" : "EUR" }
                 </button>
                 <div>
-                    <EvolutionGraph stocks={stocks} graphRange={graphRange}/>
+                    <EvolutionGraph stocks={stocks} graphRange={graphRange} showInEuro={showInEuro} euroPerUsd={euroPerUsd}/>
                     <select defaultValue={graphRange}>
                         {rangeOptions.map(entry => {
                             return <option key={entry.value} value={entry.value}>{entry.value}</option>
@@ -42,7 +41,7 @@ export class Portfolio extends React.Component {
                     </select>
                 </div>
                 <button>Add stock</button>
-                <PortfolioTable stocks={stocks} showInEuro={showInEuro}/>
+                <PortfolioTable stocks={stocks} showInEuro={showInEuro} euroPerUsd={euroPerUsd}/>
                 <button>Remove portfolio</button>
             </div>
         );
