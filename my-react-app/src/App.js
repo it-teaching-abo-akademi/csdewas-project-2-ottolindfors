@@ -5,7 +5,6 @@ import {loadFromLocalStorage, saveToLocalStorage} from "./myFunctions";
 import {AddPortfolioButton} from './AddPortfolioButton'
 import {Portfolio} from "./Portfolio";
 
-const LOCALSTORAGE_PORTFOLIOS_NAME = 'portfolios';
 const LOCALSTORAGE_APPDATA_NAME = 'appData';
 
 class App extends React.Component {

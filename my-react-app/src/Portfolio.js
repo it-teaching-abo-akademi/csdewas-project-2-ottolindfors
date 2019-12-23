@@ -1,6 +1,7 @@
 import React from "react";
 import {PortfolioTableRow} from "./PortfolioTableRow";
 import {EvolutionGraph} from "./EvolutionGraph";
+import {PortfolioTable} from "./PortfolioTable";
 
 const rangeOptions = [
     {value: "5d", text: "5 days",},
@@ -14,6 +15,8 @@ const rangeOptions = [
     {value: "max", text: "Maximum available"}
 ];
 
+const euroPerUsd = 0.90;  // Later change this to API call
+
 export class Portfolio extends React.Component {
     render() {
         // Props
@@ -21,26 +24,6 @@ export class Portfolio extends React.Component {
         const stocks = this.props.portfolio.stocks;
         const showInEuro = this.props.portfolio.userPrefs.showInEuro;
         const graphRange = this.props.portfolio.userPrefs.graphRange;
-
-        /*
-        const arrayRange = (start, stop) => {
-            return Array((stop - start + 1)).fill().map((item, idx) => stop - idx);
-        };
-        const yearOptions = arrayRange( 1970, new Date().getFullYear());
-        const monthOptions = arrayRange(1, 12);
-        const dayOptions = arrayRange(1, 31);
-        */
-
-
-        // Rows in the table
-        let rows = [];
-        for (let key in stocks) {
-            if (stocks.hasOwnProperty(key)) {
-                rows.push(
-                    <PortfolioTableRow key={key} stock={key} stockInfo={stocks[key]} showInEuro={showInEuro}/>
-                );
-            }
-        }
 
         // For handling button press read https://reactjs.org/docs/handling-events.html
 
@@ -59,20 +42,7 @@ export class Portfolio extends React.Component {
                     </select>
                 </div>
                 <button>Add stock</button>
-                <button>Remove selected stocks</button>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Stock</th>
-                            <th>Latest Price</th>
-                            <th>Purchase Price</th>
-                            <th>Shares</th>
-                            <th>Total</th>
-                            <th>Select</th>
-                        </tr>
-                    </thead>
-                    <tbody>{rows}</tbody>
-                </table>
+                <PortfolioTable stocks={stocks} showInEuro={showInEuro}/>
                 <button>Remove portfolio</button>
             </div>
         );
