@@ -2,18 +2,22 @@ import React from 'react';
 import './App.css';
 import {urlBuilder, urlBuilderDate} from "./api";
 import {loadFromLocalStorage, saveToLocalStorage} from "./myFunctions";
-import {AddPortfolioButton} from './AddPortfolioButton'
+import {AddPortfolioModal} from './AddPortfolioModal'
 import {Portfolio} from "./Portfolio";
 
 const LOCALSTORAGE_APPDATA_NAME = 'appData';
+const DEFAULT_USER_PREFS = {showInEuro: false, graphRange: "6m"};
 
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             appData: {},  // All data
+            showAddPortfolioModal: false,
             loading: false,
         };
+        this.toggleShowAddPortfolioModal = this.toggleShowAddPortfolioModal.bind(this);
+        this.handleAddPortfolio = this.handleAddPortfolio.bind(this);
     }
 
     // Fetches latest quote and/or chart (historic data) for all stockSymbols
@@ -70,7 +74,7 @@ class App extends React.Component {
                 let appData = this.state.appData;
                 appData[newPortfolioName] = {"stocks": stockData};
                 // Add currency and graph visualisation range preference
-                appData[newPortfolioName]["userPrefs"] = {showInEuro: false, graphRange: "6m"};
+                appData[newPortfolioName]["userPrefs"] = DEFAULT_USER_PREFS;
                 // Set state
                 this.setState(
                     { appData: appData },
@@ -142,8 +146,30 @@ class App extends React.Component {
         }
     }
 
+    toggleShowAddPortfolioModal() {
+        this.setState({ showAddPortfolioModal: !this.state.showAddPortfolioModal });
+    };
+
+    handleAddPortfolio(newPortfolioName) {
+        // Hide the modal
+        this.toggleShowAddPortfolioModal();
+        // Create new portfolio with no stocks default user preferences.
+        console.log("==> Creating new portfolio '" + newPortfolioName + "'");
+        let appData = this.state.appData;
+        appData[newPortfolioName] = {"userPrefs": DEFAULT_USER_PREFS};
+        appData[newPortfolioName]["stocks"] = {};
+        this.setState(
+            {appData: appData},
+            () => {
+                console.log("==> Created new portfolio '" + newPortfolioName + "'");
+                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+            }
+        );
+    }
+
     render() {
         console.log("==> App render");
+
         // Get list of portfolios from appData
         const appData = this.state.appData;
         let portfolios = [];
@@ -159,10 +185,24 @@ class App extends React.Component {
                 <h1>SPMS</h1>
                 <a href="https://iexcloud.io">Data provided by IEX Cloud</a>
                 <p>15 minute delay in price</p>
-                <AddPortfolioButton />
+                <button
+                    onClick={this.toggleShowAddPortfolioModal}>
+                    Add portfolio
+                </button>
+                <AddPortfolioModal
+                    show={this.state.showAddPortfolioModal}
+                    onCancel={this.toggleShowAddPortfolioModal}
+                    onAdd={this.handleAddPortfolio}
+                    portfolios={portfolios}>
+                    "We are the children of this modal"
+                </AddPortfolioModal>
                 {portfolios.map(portfolioName =>
                     // Pass portfolio name and portfolio data to the portfolio
-                    <Portfolio key={portfolioName} name={portfolioName} portfolio={appData[portfolioName]} />
+                    <Portfolio
+                        key={portfolioName}
+                        name={portfolioName}
+                        portfolio={appData[portfolioName]}
+                    />
                 )}
             </div>
         );
