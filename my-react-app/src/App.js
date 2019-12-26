@@ -139,10 +139,13 @@ class App extends React.Component {
         catch (error) {
             console.log("==>", error);
             // *** CREATE DUMMY DATA. DO NOT USE IN PRODUCTION ***
+            /*
             console.log("==> Creating dummy data");
             this.createAndAppendDummyPortfolio("My Big Portfolio", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', 'max');
             this.createAndAppendDummyPortfolio("My Big Portfolio 2", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', 'max');
             this.createAndAppendDummyPortfolio("My Big Portfolio 3", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', 'max');
+             */
+
         }
     }
 

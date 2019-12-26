@@ -54,6 +54,9 @@ export class Portfolio extends React.Component {
                 <button>
                     {showInEuro ? "USD" : "EUR" }
                 </button>
+                <button>
+                    Refresh/Update
+                </button>
                 <div>
                     <EvolutionGraph stocks={stocks} graphRange={graphRange} showInEuro={showInEuro} euroPerUsd={euroPerUsd}/>
                     <select defaultValue={graphRange}>

@@ -9,10 +9,10 @@ In a later update the functionality of manually entering purchase prices will be
 one has bought multiple shares of the same stock at different dates.
 
 3. Due to local storage limitations only the history since the purchase date is fetched 
-for the graph.  
-In a future update the fetched data will be cleaned for a much smaller footprint. Also 
-history that goes further back than purchase date will be fetched on demand (as needed)
-from the API and not stored to local storage.
+for the graph. The data is cleaned so that only the necessary data is saved to local 
+storage.
+In a future update history that goes further back than purchase date will be fetched on 
+demand (as needed) from the API.
 
 ## Known issues
   * Converting the stock values to euro and rounding them to two decimal places with 

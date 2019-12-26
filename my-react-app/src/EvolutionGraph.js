@@ -1,5 +1,6 @@
 import React from "react";
 import {LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line, ResponsiveContainer} from "recharts";
+import {dateToChartRange} from "./myFunctions";
 
 export class EvolutionGraph extends React.PureComponent{
 
@@ -50,21 +51,21 @@ export class EvolutionGraph extends React.PureComponent{
         const euroPerUsd = this.props.euroPerUsd;
 
         const data = [];
+        let datesInData = [];
         let stockNames = [];
 
         // Translate 'graphRange' to number of days
         const graphRangeLimitDate = this.graphRangeToDate(graphRange);
 
         // Populate 'data' and 'stockNames' with data in the correct format for the LineChart component
-        for (let stock in stocks) {  // stock = aapl, fb, ...
+        for (let stock in stocks) {  // stocks = {aapl: {...}, fb: {...}, ...}
             if (stocks.hasOwnProperty(stock)) {
                 stockNames.push(stock);
 
                 const chart = stocks[stock].chart;
-                let dataKey = 0;
-                for (let chartKey in chart) {  // key = 0, 1, 2, ...
+                for (let chartKey in chart) {  // chart = {0: {date: --, close: --}, 1: {date: --, close: --}, ...}
                     if (chart.hasOwnProperty(chartKey)) {
-                        const date = chart[chartKey].date;
+                        // Close value in correct currency
                         let close = 0;
                         if (showInEuro) {
                             close = Number((chart[chartKey].close * euroPerUsd).toFixed(2));  // .toFixed(2) without casting to Number causes the chart to scale incorrectly (if there are problems in the future).
@@ -73,23 +74,34 @@ export class EvolutionGraph extends React.PureComponent{
                             close = chart[chartKey].close
                         }
 
+                        // Date
+                        const date = chart[chartKey].date;
 
                         // Filter the dates for the graph (LineChart)
                         if (new Date(date) >= graphRangeLimitDate) {
-                            if (dataKey in data) {
-                                // Add another stock's close value to existing entry (created in previous iterations)
-                                const dataEntry = data[dataKey];
-                                dataEntry[stock] = close;  // { name: "2019-12-16", FB: 205.12, AAPL: 123.45 }
-                                data[dataKey] = dataEntry;
-                            }
-                            else {
-                                // Create new entry. Add first stock's close value
+                            // Check if date exist in data
+                            if(!datesInData.includes(date)) {
+                                // Keeping track of what dates are already in data. Easier and faster this way than iterating data
+                                datesInData.push(date);
+
+                                // Create new entry in data. Add first stock's close value
                                 const dataEntry = {};
                                 dataEntry["name"] = date;
                                 dataEntry[stock] = close;  // { name: "2019-12-16", FB: 205.12 }
-                                data.push(dataEntry);  // [{ name: "2019-12-16", FB: 205.12 }, { name: "2019-12-16", FB: 205.12 }, ...]
+                                data.push(dataEntry);  // [{ name: "2019-12-16", FB: 205.12 }, ...]
                             }
-                            dataKey++;
+                            else {
+                                // The date does already exist in data.
+                                // Add the stocks value to an already existing entry.
+
+                                // data is an array so the values/entries have fixed order.
+                                // the values/entries in data has the exact same order as the dates in datesInData
+                                // (this is because they are added by the above if statement)
+                                const idx = datesInData.indexOf(date);
+                                let dataEntry = data[idx];
+                                dataEntry[stock] = close;
+                                data[idx] = dataEntry;  // keeps the order intact
+                            }
                         }
                     }
                 }
