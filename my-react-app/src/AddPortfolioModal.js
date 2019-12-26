@@ -49,21 +49,25 @@ export class AddPortfolioModal extends React.Component {
         }
     }
     handleOnCancel() {
+        this.setState({
+            newPortfolioName: "",
+            inputError: "",
+            submitError: "",
+        });
         this.props.onCancel();
     }
     render() {
         if (!this.props.show) {
-            // Render nothing
+            // Should render nothing in the future
             return <p>Modal hidden</p>;
         }
         return (
             <div>
                 <p>Modal visible</p>
-                {this.props.children}
                 <form onSubmit={this.handleOnSubmit}>
                     <label>
                         Portfolio name
-                        <input type="text" value={this.state.newPortfolioName} onChange={this.handleOnChange}/>
+                        <input type="text" value={this.state.newPortfolioName} onChange={this.handleOnChange} required/>
                     </label>
                     <p>{this.state.inputError}</p>
                     <p>{this.state.submitError}</p>

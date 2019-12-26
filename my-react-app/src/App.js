@@ -18,6 +18,7 @@ class App extends React.Component {
         };
         this.toggleShowAddPortfolioModal = this.toggleShowAddPortfolioModal.bind(this);
         this.handleAddPortfolio = this.handleAddPortfolio.bind(this);
+        this.handleAddStock = this.handleAddStock.bind(this);
     }
 
     // Fetches latest quote and/or chart (historic data) for all stockSymbols
@@ -149,7 +150,6 @@ class App extends React.Component {
     toggleShowAddPortfolioModal() {
         this.setState({ showAddPortfolioModal: !this.state.showAddPortfolioModal });
     };
-
     handleAddPortfolio(newPortfolioName) {
         // Hide the modal
         this.toggleShowAddPortfolioModal();
@@ -166,7 +166,14 @@ class App extends React.Component {
             }
         );
     }
-
+    handleAddStock(portfolioName, stockSymbol, purchaseDate, purchasePrice, shares) {
+        // Add a new stock to the portfolio in appData and save to local storage.
+        console.log("==> Add stock to", portfolioName, stockSymbol, purchaseDate, purchasePrice, shares);
+        // TODO: Add these values as a new stock in a portfolio in appData.
+        //  Then calculate based on purchase date how much chart data is needed.
+        //  Then fetch quota and chart data from the purchase date untill today.
+        //  Then add it to appData and save to local storage.
+    }
     render() {
         console.log("==> App render");
 
@@ -202,6 +209,7 @@ class App extends React.Component {
                         key={portfolioName}
                         name={portfolioName}
                         portfolio={appData[portfolioName]}
+                        onAddStock={this.handleAddStock}
                     />
                 )}
             </div>

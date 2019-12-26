@@ -1,6 +1,7 @@
 import React from "react";
 import {EvolutionGraph} from "./EvolutionGraph";
 import {PortfolioTable} from "./PortfolioTable";
+import {AddStockModal} from "./AddStockModal";
 
 const rangeOptions = [
     {value: "5d", text: "5 days",},
@@ -17,6 +18,21 @@ const rangeOptions = [
 const euroPerUsd = 0.90;  // Later change this to API call
 
 export class Portfolio extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showAddStockModal: false,
+        };
+        this.toggleShowAddStockModal = this.toggleShowAddStockModal.bind(this);
+        this.handleAddStock = this.handleAddStock.bind(this);
+    }
+    toggleShowAddStockModal() {
+        this.setState({ showAddStockModal: !this.state.showAddStockModal });
+    }
+    handleAddStock(stockSymbol, purchaseDate, purchasePrice, shares) {
+        this.toggleShowAddStockModal();
+        this.props.onAddStock(this.props.name, stockSymbol, purchaseDate, purchasePrice, shares);
+    }
     render() {
         // Props
         const name = this.props.name;
@@ -40,9 +56,24 @@ export class Portfolio extends React.Component {
                         })}
                     </select>
                 </div>
-                <button>Add stock</button>
-                <PortfolioTable stocks={stocks} showInEuro={showInEuro} euroPerUsd={euroPerUsd}/>
-                <button>Remove portfolio</button>
+                <button
+                    onClick={this.toggleShowAddStockModal}>
+                    Add stock
+                </button>
+                <AddStockModal
+                    show={this.state.showAddStockModal}
+                    onCancel={this.toggleShowAddStockModal}
+                    onAdd={this.handleAddStock}>
+                    "I am a child of this modal"
+                </AddStockModal>
+                <PortfolioTable
+                    stocks={stocks}
+                    showInEuro={showInEuro}
+                    euroPerUsd={euroPerUsd}
+                />
+                <button>
+                    Remove portfolio
+                </button>
             </div>
         );
     }

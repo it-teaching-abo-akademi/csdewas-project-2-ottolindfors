@@ -98,10 +98,12 @@ export class EvolutionGraph extends React.PureComponent{
 
         return (
             // Responsive container makes the chart adapt to the sise of the parent container
+            // margin={{top:5, right: 30, left: 20, bottom: 5}}
+            // use type="monotone" in Line to make the graph smooth
             <div>
                 <ResponsiveContainer aspect={1.7} width={500}>
-                    <LineChart width="100%" height="100%" data={data} margin={{top:5, right: 30, left: 20, bottom: 5}}>
-                        <CartesianGrid strokeDasharray="3 3"/>
+                    <LineChart width="100%" height="100%" data={data}>
+                        <CartesianGrid strokeDasharray="1 3"/>
                         <XAxis dataKey="name"/>
                         <YAxis/>
                         <Tooltip/>
@@ -109,7 +111,7 @@ export class EvolutionGraph extends React.PureComponent{
                         {stockNames.map(stockName =>
                             <Line
                                 key={stockName}
-                                type="monotone"
+
                                 dataKey={stockName}
                                 stroke={this.generateHslColor()}
                                 activeDot={{ r: 4 }}
