@@ -18,6 +18,54 @@ function saver(obj, objName) {
     console.log("==> Saved to local storage '" + objName + "'");
 }
 
+export function dateToChartRange(isoPurchaseDate) {
+    const purchaseDate = new Date(isoPurchaseDate);
+    const todayDate = new Date();
+    const dayDiff = Math.ceil((todayDate - purchaseDate) / (1000 * 60 * 60 * 24));  // Ceil ensures enough days
+    const janFirst = new Date(new Date().toISOString().slice(0,4));  // new Date("2019") returns 1 Jan 2019
+    const ytdDiff = Math.ceil((todayDate - janFirst) / (1000 * 60 * 60 * 24));  // Days since Jan 1 (at most 365)
+
+
+    // graphRange options are 5d, 1m, 3m, 6m, ytd, 1y, 2y, 5y, max
+    let chartRange = "";
+    console.log(dayDiff);
+
+    if (dayDiff < 5) {
+        // 5 days is enough
+        chartRange = "5d";
+        if (ytdDiff < 5) {chartRange = "ytd"}
+    }
+    else if (dayDiff < 32) {
+        // 1 month is enough
+        chartRange = "1m";
+        if (ytdDiff < 32) {chartRange = "ytd"}
+    }
+    else if (dayDiff < 94) {
+        // 3 months is enough
+        chartRange = "3m";
+        if (ytdDiff < 94) {chartRange = "ytd"}
+    }
+    else if (dayDiff< 168) {
+        chartRange = "6m";
+        if (ytdDiff < 168) {chartRange = "ytd"}
+    }
+    else if (dayDiff < 367) {
+        chartRange = "1y";
+        if (ytdDiff < 367) {chartRange = "ytd"}
+    }
+    else if (dayDiff < 732) {
+        chartRange = "2y";
+    }
+    else if (dayDiff < 1828) {
+        chartRange = "5y";
+    }
+    else {
+        chartRange = "max"
+    }
+
+    return chartRange;
+}
+
 export const loadFromLocalStorage = (objName) => {
   return loader(objName);
 };

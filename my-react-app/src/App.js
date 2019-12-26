@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import {urlBuilder, urlBuilderDate} from "./api";
-import {loadFromLocalStorage, saveToLocalStorage} from "./myFunctions";
+import {dateToChartRange, loadFromLocalStorage, saveToLocalStorage} from "./myFunctions";
 import {AddPortfolioModal} from './AddPortfolioModal'
 import {Portfolio} from "./Portfolio";
 
@@ -38,7 +38,6 @@ class App extends React.Component {
             })
             .catch(error => this.setState({error: error}));
     }
-
     puchasePriceFetcher(stockSymbol, yyyymmdd) {
         const apiUrl = urlBuilderDate(stockSymbol, yyyymmdd);
         return fetch(apiUrl)
@@ -168,12 +167,51 @@ class App extends React.Component {
     }
     handleAddStock(portfolioName, stockSymbol, purchaseDate, purchasePrice, shares) {
         // Add a new stock to the portfolio in appData and save to local storage.
-        console.log("==> Add stock to", portfolioName, stockSymbol, purchaseDate, purchasePrice, shares);
-        // TODO: Add these values as a new stock in a portfolio in appData.
-        //  Then calculate based on purchase date how much chart data is needed.
-        //  Then fetch quota and chart data from the purchase date untill today.
-        //  Then add it to appData and save to local storage.
+        console.log("==> Adding stock to", portfolioName, stockSymbol, purchaseDate, purchasePrice, shares);
+
+        // Calculate the needed chartRange
+        const chartRange = dateToChartRange(purchaseDate);
+        // Fetch chart and quota data.
+        const type = 'quote,chart';
+
+        let dataFetcher = this.dataFetcher([stockSymbol], type, chartRange);
+        dataFetcher.then(stockData => {
+            const stockSymbol = Object.keys(stockData)[0];  // exact same as stockSymbol
+
+            // Clean the data for a smaller storage footprint
+
+            // Get only the necessary quote data
+            let quote = {};
+            quote["companyName"] = stockData[stockSymbol].quote["companyName"];
+            quote["latestPrice"] = stockData[stockSymbol].quote["latestPrice"];
+
+            // Get only the necessary chart data
+            let chart = {};
+            const chartData = stockData[stockSymbol].chart;
+            for (let key in chartData) {
+                if (chartData.hasOwnProperty(key)) {
+                    chart[key] = {"date": chartData[key].date, "close": chartData[key].close};
+                }
+            }
+
+            // Purchase info
+            const purchase = {date: purchaseDate, price: purchasePrice, shares: shares, currency: "USD"};  // default currency "USD"
+
+            // Add quote, chart and purchase to existing portfolio
+            let appData = this.state.appData;
+            appData[portfolioName].stocks[stockSymbol] = {"quote": quote, "chart": chart, "purchase": purchase};
+
+            // Set state and save to local storage
+            this.setState(
+                { appData: appData },
+                () => {
+                    console.log("==> State set. Stock data added to '" + portfolioName + "'");
+                    saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+                }
+            )
+        });
     }
+
     render() {
         console.log("==> App render");
 
