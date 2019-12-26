@@ -75,7 +75,7 @@ class App extends React.Component {
                 let appData = this.state.appData;
                 appData[newPortfolioName] = {"stocks": stockData};
                 // Add currency and graph visualisation range preference
-                appData[newPortfolioName]["userPrefs"] = DEFAULT_USER_PREFS;
+                appData[newPortfolioName]["userPrefs"] = {showInEuro: false, graphRange: "6m"};
                 // Set state
                 this.setState(
                     { appData: appData },
@@ -125,7 +125,7 @@ class App extends React.Component {
         FIRST TRY LOADING DATA FROM LOCAL STORAGE.
         IF THERE IS NOTHING IN LOCAL STORAGE THEN LOAD FROM INTERNET (BUT ONLY ON USER INPUT REFRESH/GET/ADD BUTTON)
          */
-
+        console.log("==> componentDidLoad");
         // Load array of portfolio names and all app data from local storage. Throws error if not found and fails silently outputting error only to console.
         try {
             const appData = loadFromLocalStorage(LOCALSTORAGE_APPDATA_NAME);  // Trows error if not found

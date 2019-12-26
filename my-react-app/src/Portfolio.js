@@ -34,7 +34,13 @@ export class Portfolio extends React.Component {
         this.props.onAddStock(this.props.name, stockSymbol, purchaseDate, purchasePrice, shares);
     }
     render() {
-        // Props
+        // Prevent errors when initial (and maybe also other asynchronous) render happen before userPrefs and name are set in appData.
+        if (typeof this.props.name === 'undefined' ||
+            typeof this.props.portfolio === 'undefined' ||
+            typeof this.props.portfolio.userPrefs === 'undefined'
+        ) {
+            return <p>Loading ...</p>
+        }
         const name = this.props.name;
         const stocks = this.props.portfolio.stocks;
         const showInEuro = this.props.portfolio.userPrefs.showInEuro;
