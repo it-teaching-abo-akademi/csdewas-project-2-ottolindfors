@@ -11,7 +11,6 @@ export class EvolutionGraph extends React.PureComponent{
         const lightness = "70%";
         return "hsl(" + hue + "," + saturation + "," + lightness + ")";
     }
-
     graphRangeToDate(graphRange) {
         // graphRange options are 5d, 1m, 3m, 6m, ytd, 1y, 2y, 5y, max
         if (graphRange.includes("d")) {
@@ -42,6 +41,11 @@ export class EvolutionGraph extends React.PureComponent{
             // Set the date 500 years in the past and return the new date
             return new Date(new Date().setFullYear(dateToday.getFullYear() - years));
         }
+    }
+    compareFunction(a, b) {
+        if (a.name < b.name) {return -1}
+        if (a.name > b.name) {return 1}
+        return 0;
     }
 
     render() {
@@ -107,6 +111,9 @@ export class EvolutionGraph extends React.PureComponent{
                 }
             }
         }
+
+        // Sort data. Recharts assumes the data is ordered.
+        data.sort(this.compareFunction);
 
         return (
             // Responsive container makes the chart adapt to the sise of the parent container

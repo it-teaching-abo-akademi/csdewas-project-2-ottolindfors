@@ -200,6 +200,10 @@ class App extends React.Component {
             // Purchase info
             const purchase = {date: purchaseDate, price: purchasePrice, shares: shares, currency: "USD"};  // default currency "USD"
 
+            // TODO: Resolve issue where an existing stock gets replaced if it is added twice.
+            //  E.g. Portfolio has 4 AAPL stocks. Adding more AAPL stocks would just overvrite the existing ones with the new ones.
+            //  It should create a new separate entry instead.
+
             // Add quote, chart and purchase to existing portfolio
             let appData = this.state.appData;
             appData[portfolioName].stocks[stockSymbol] = {"quote": quote, "chart": chart, "purchase": purchase};
