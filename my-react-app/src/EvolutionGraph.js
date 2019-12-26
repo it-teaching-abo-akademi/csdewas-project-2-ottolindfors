@@ -1,9 +1,10 @@
 import React from "react";
 import {LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line, ResponsiveContainer} from "recharts";
-import {dateToChartRange} from "./myFunctions";
+import {compareFunctionWName, dateToChartRange} from "./myFunctions";
 
 export class EvolutionGraph extends React.PureComponent{
 
+    // Move these two functions to myfunctions.js
     generateHslColor() {
         // Generate random hsl color. Ensures the color is visible on the chart
         const hue = (Math.random() * 360).toFixed(0).toString();
@@ -41,11 +42,6 @@ export class EvolutionGraph extends React.PureComponent{
             // Set the date 500 years in the past and return the new date
             return new Date(new Date().setFullYear(dateToday.getFullYear() - years));
         }
-    }
-    compareFunction(a, b) {
-        if (a.name < b.name) {return -1}
-        if (a.name > b.name) {return 1}
-        return 0;
     }
 
     render() {
@@ -113,7 +109,7 @@ export class EvolutionGraph extends React.PureComponent{
         }
 
         // Sort data. Recharts assumes the data is ordered.
-        data.sort(this.compareFunction);
+        data.sort(compareFunctionWName);
 
         return (
             // Responsive container makes the chart adapt to the sise of the parent container

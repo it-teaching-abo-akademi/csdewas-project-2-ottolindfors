@@ -1,4 +1,4 @@
-const TOKEN = 'Tpk_391653b184fb45f2a8e9b1270c0306e9';
+const TOKEN = 'Tpk_564e31a7cc054b8c87a93c668202adce';
 const BASE_URL = 'https://sandbox.iexapis.com/stable/stock/market/batch?';
 const BASE_URL_DATE = 'https://sandbox.iexapis.com/stable/stock/';
 

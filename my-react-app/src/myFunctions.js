@@ -28,7 +28,6 @@ export function dateToChartRange(isoPurchaseDate) {
 
     // graphRange options are 5d, 1m, 3m, 6m, ytd, 1y, 2y, 5y, max
     let chartRange = "";
-    console.log(dayDiff);
 
     if (dayDiff < 5) {
         // 5 days is enough
@@ -64,6 +63,18 @@ export function dateToChartRange(isoPurchaseDate) {
     }
 
     return chartRange;
+}
+
+export function compareFunctionWName(a, b) {
+    if (a.name < b.name) {return -1}
+    if (a.name > b.name) {return 1}
+    return 0;
+}
+
+export function compareFunctionWDate(a, b) {
+    if (a.date < b.date) {return -1}
+    if (a.date > b.date) {return 1}
+    return 0;
 }
 
 export const loadFromLocalStorage = (objName) => {

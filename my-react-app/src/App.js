@@ -1,9 +1,17 @@
 import React from 'react';
 import './App.css';
 import {urlBuilder, urlBuilderDate} from "./api";
-import {dateToChartRange, loadFromLocalStorage, saveToLocalStorage} from "./myFunctions";
+import {
+    compareFunctionWDate,
+    dateToChartRange,
+    loadFromLocalStorage,
+    saveToLocalStorage
+} from "./myFunctions";
 import {AddPortfolioModal} from './AddPortfolioModal'
 import {Portfolio} from "./Portfolio";
+import {minimizeData, minimizeDataStocksOnly} from "./dataFunctions";
+
+// TODO: Reuse code segments
 
 const LOCALSTORAGE_APPDATA_NAME = 'appData';
 const DEFAULT_USER_PREFS = {showInEuro: false, graphRange: "6m"};
@@ -15,13 +23,16 @@ class App extends React.Component {
             appData: {},  // All data
             showAddPortfolioModal: false,
             loading: false,
+            isUpdating: false,
         };
         this.toggleShowAddPortfolioModal = this.toggleShowAddPortfolioModal.bind(this);
         this.handleAddPortfolio = this.handleAddPortfolio.bind(this);
         this.handleAddStock = this.handleAddStock.bind(this);
+        this.handleOnUpdate = this.handleOnUpdate.bind(this);
         this.handleToggleShowInEuro = this.handleToggleShowInEuro.bind(this);
     }
 
+    // Move these two functions to myFunctions.js
     // Fetches latest quote and/or chart (historic data) for all stockSymbols
     dataFetcher(stockSymbols, type, chartRange) {
         const apiUrl = urlBuilder(stockSymbols, type, chartRange);
@@ -87,7 +98,6 @@ class App extends React.Component {
             }
         );
     }
-
     refreshPortfolio(portfolioName) {
         /*
         Refresh portfolio data (called on button press)
@@ -175,39 +185,20 @@ class App extends React.Component {
 
         // Calculate the needed chartRange
         const chartRange = dateToChartRange(purchaseDate);
-        // Fetch chart and quota data.
+        // Fetch chart and quota data
         const type = 'quote,chart';
 
         let dataFetcher = this.dataFetcher([stockSymbol], type, chartRange);
         dataFetcher.then(stockData => {
-            const stockSymbol = Object.keys(stockData)[0];  // exact same as stockSymbol
-
-            // Clean the data for a smaller storage footprint
-
-            // Get only the necessary quote data
-            let quote = {};
-            quote["companyName"] = stockData[stockSymbol].quote["companyName"];
-            quote["latestPrice"] = stockData[stockSymbol].quote["latestPrice"];
-
-            // Get only the necessary chart data
-            let chart = {};
-            const chartData = stockData[stockSymbol].chart;
-            for (let key in chartData) {
-                if (chartData.hasOwnProperty(key)) {
-                    chart[key] = {"date": chartData[key].date, "close": chartData[key].close};
-                }
-            }
-
-            // Purchase info
-            const purchase = {date: purchaseDate, price: purchasePrice, shares: shares, currency: "USD"};  // default currency "USD"
-
-            // TODO: Resolve issue where an existing stock gets replaced if it is added twice.
-            //  E.g. Portfolio has 4 AAPL stocks. Adding more AAPL stocks would just overvrite the existing ones with the new ones.
-            //  It should create a new separate entry instead.
-
-            // Add quote, chart and purchase to existing portfolio
             let appData = this.state.appData;
-            appData[portfolioName].stocks[stockSymbol] = {"quote": quote, "chart": chart, "purchase": purchase};
+            appData = minimizeData(
+                stockData,
+                appData,
+                portfolioName,
+                purchaseDate,
+                purchasePrice,
+                shares
+            );
 
             // Set state and save to local storage
             this.setState(
@@ -218,6 +209,49 @@ class App extends React.Component {
                 }
             )
         });
+    }
+    async handleOnUpdate(portfolioName) {
+        // Ad-hoc solution to use async here.
+        // The dataFetcher is asynchronous and therefore needs await.
+        // Since dataFetcher is inside a for loop the loop would not otherwise "wait" in the results (.then)
+
+        // Basically the same as handleAddStock
+        console.log("==> Updating '" + portfolioName + "'");
+        this.setState({ isUpdating : true });
+
+        let appData = this.state.appData;
+
+        // Update one stock at a time since the purchase dates may wildly vary
+        let stocks = appData[portfolioName].stocks;
+        for (let stock in stocks) {
+            if (stocks.hasOwnProperty(stock)) {
+                console.log(stock);
+                // Calculate the needed chartRange
+                const chartRange = dateToChartRange(stocks[stock].purchase.date);
+                // Fetch chart and quota data
+                const type = 'quote,chart';
+
+                // Fetch the new stock data
+                let dataFetcher = this.dataFetcher([stock], type, chartRange);
+                await dataFetcher.then(stockData => {
+                    console.log("then");
+                    appData = minimizeDataStocksOnly(
+                        stockData,
+                        appData,
+                        portfolioName
+                    );
+                })
+            }
+        }
+
+        // Set state and save to local storage
+        this.setState(
+            { appData: appData, isUpdating: false},
+            () => {
+                console.log("==> Portfolio '" + portfolioName + "' updated", appData);
+                saveToLocalStorage(appData, LOCALSTORAGE_APPDATA_NAME);
+            }
+        )
     }
     handleToggleShowInEuro(event) {
         const portfolioName = event.target.name;
@@ -261,7 +295,9 @@ class App extends React.Component {
                         key={portfolioName}
                         name={portfolioName}
                         portfolio={appData[portfolioName]}
+                        isUpdating={this.state.isUpdating}
                         onToggleShowInEuro={this.handleToggleShowInEuro}
+                        onUpdate={this.handleOnUpdate}
                         onAddStock={this.handleAddStock}
                     />
                 )}

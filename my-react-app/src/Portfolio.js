@@ -14,7 +14,6 @@ const rangeOptions = [
     {value: "5y", text: "5 years"},
     {value: "max", text: "Maximum available"}
 ];
-
 const euroPerUsd = 0.90;  // Later change this to API call
 
 export class Portfolio extends React.Component {
@@ -24,11 +23,16 @@ export class Portfolio extends React.Component {
             showAddStockModal: false,
         };
         this.handleToggleShowInEuro = this.handleToggleShowInEuro.bind(this);
+        this.handleOnUpdate = this.handleOnUpdate.bind(this);
         this.handleToggleShowAddStockModal = this.handleToggleShowAddStockModal.bind(this);
         this.handleAddStock = this.handleAddStock.bind(this);
     }
     handleToggleShowInEuro(event) {
         this.props.onToggleShowInEuro(event);
+    }
+    handleOnUpdate(event) {
+        // Send portfolio's name to the parent function
+        this.props.onUpdate(event.target.name);
     }
     handleToggleShowAddStockModal() {
         this.setState({ showAddStockModal: !this.state.showAddStockModal });
@@ -45,10 +49,15 @@ export class Portfolio extends React.Component {
         ) {
             return <p>Loading ...</p>
         }
+        // Props
         const name = this.props.name;
-        const stocks = this.props.portfolio.stocks;
-        const showInEuro = this.props.portfolio.userPrefs.showInEuro;
-        const graphRange = this.props.portfolio.userPrefs.graphRange;
+        const portfolio = this.props.portfolio;
+        const isUpdating = this.props.isUpdating;
+        // "Refined" props
+        const stocks = portfolio.stocks;
+        const showInEuro = portfolio.userPrefs.showInEuro;
+        const graphRange = portfolio.userPrefs.graphRange;
+
 
         // For handling button press read https://reactjs.org/docs/handling-events.html
 
@@ -60,8 +69,10 @@ export class Portfolio extends React.Component {
                     onClick={this.handleToggleShowInEuro}>
                     {showInEuro ? "USD" : "EUR" }
                 </button>
-                <button>
-                    Refresh/Update
+                <button
+                    name={name}
+                    onClick={this.handleOnUpdate}>
+                    {isUpdating ? "Fetching ..." : "Update"}
                 </button>
                 <div>
                     <EvolutionGraph
