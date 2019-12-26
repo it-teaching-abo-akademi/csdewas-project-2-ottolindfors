@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "24b9e339f195b3dd2eee92e865433049",
+    "revision": "c04a47067595c34b504054c65d1f942c",
     "url": "/csdewas-project-2-ottolindfors/index.html"
   },
   {
-    "revision": "eacb1196622f84b69fb5",
+    "revision": "6e7ea7fc7b69b021c87d",
     "url": "/csdewas-project-2-ottolindfors/static/css/main.5facb584.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/csdewas-project-2-ottolindfors/static/js/2.674280eb.chunk.js.LICENSE"
   },
   {
-    "revision": "eacb1196622f84b69fb5",
-    "url": "/csdewas-project-2-ottolindfors/static/js/main.29405d2c.chunk.js"
+    "revision": "6e7ea7fc7b69b021c87d",
+    "url": "/csdewas-project-2-ottolindfors/static/js/main.2daeb4fe.chunk.js"
   },
   {
     "revision": "65c0ae49ffbae837e0e5",
