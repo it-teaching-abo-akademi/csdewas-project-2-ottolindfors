@@ -19,6 +19,7 @@ class App extends React.Component {
         this.toggleShowAddPortfolioModal = this.toggleShowAddPortfolioModal.bind(this);
         this.handleAddPortfolio = this.handleAddPortfolio.bind(this);
         this.handleAddStock = this.handleAddStock.bind(this);
+        this.handleToggleShowInEuro = this.handleToggleShowInEuro.bind(this);
     }
 
     // Fetches latest quote and/or chart (historic data) for all stockSymbols
@@ -218,6 +219,12 @@ class App extends React.Component {
             )
         });
     }
+    handleToggleShowInEuro(event) {
+        const portfolioName = event.target.name;
+        let appData = this.state.appData;
+        appData[portfolioName].userPrefs["showInEuro"] = !appData[portfolioName].userPrefs["showInEuro"];
+        this.setState({ appData: appData });
+    }
 
     render() {
         console.log("==> App render");
@@ -254,6 +261,7 @@ class App extends React.Component {
                         key={portfolioName}
                         name={portfolioName}
                         portfolio={appData[portfolioName]}
+                        onToggleShowInEuro={this.handleToggleShowInEuro}
                         onAddStock={this.handleAddStock}
                     />
                 )}

@@ -23,14 +23,18 @@ export class Portfolio extends React.Component {
         this.state = {
             showAddStockModal: false,
         };
-        this.toggleShowAddStockModal = this.toggleShowAddStockModal.bind(this);
+        this.handleToggleShowInEuro = this.handleToggleShowInEuro.bind(this);
+        this.handleToggleShowAddStockModal = this.handleToggleShowAddStockModal.bind(this);
         this.handleAddStock = this.handleAddStock.bind(this);
     }
-    toggleShowAddStockModal() {
+    handleToggleShowInEuro(event) {
+        this.props.onToggleShowInEuro(event);
+    }
+    handleToggleShowAddStockModal() {
         this.setState({ showAddStockModal: !this.state.showAddStockModal });
     }
     handleAddStock(stockSymbol, purchaseDate, purchasePrice, shares) {
-        this.toggleShowAddStockModal();
+        this.handleToggleShowAddStockModal();
         this.props.onAddStock(this.props.name, stockSymbol, purchaseDate, purchasePrice, shares);
     }
     render() {
@@ -51,27 +55,38 @@ export class Portfolio extends React.Component {
         return (
             <div>
                 <h2>{name}</h2>
-                <button>
+                <button
+                    name={name}
+                    onClick={this.handleToggleShowInEuro}>
                     {showInEuro ? "USD" : "EUR" }
                 </button>
                 <button>
                     Refresh/Update
                 </button>
                 <div>
-                    <EvolutionGraph stocks={stocks} graphRange={graphRange} showInEuro={showInEuro} euroPerUsd={euroPerUsd}/>
+                    <EvolutionGraph
+                        stocks={stocks}
+                        graphRange={graphRange}
+                        showInEuro={showInEuro}
+                        euroPerUsd={euroPerUsd}
+                    />
                     <select defaultValue={graphRange}>
                         {rangeOptions.map(entry => {
-                            return <option key={entry.value} value={entry.value}>{entry.value}</option>
+                            return <option
+                                key={entry.value}
+                                value={entry.value}>
+                                {entry.value}
+                            </option>
                         })}
                     </select>
                 </div>
                 <button
-                    onClick={this.toggleShowAddStockModal}>
+                    onClick={this.handleToggleShowAddStockModal}>
                     Add stock
                 </button>
                 <AddStockModal
                     show={this.state.showAddStockModal}
-                    onCancel={this.toggleShowAddStockModal}
+                    onCancel={this.handleToggleShowAddStockModal}
                     onAdd={this.handleAddStock}>
                     "I am a child of this modal"
                 </AddStockModal>
