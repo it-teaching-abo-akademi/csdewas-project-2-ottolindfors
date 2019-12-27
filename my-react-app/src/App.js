@@ -27,6 +27,7 @@ class App extends React.Component {
         this.handleOnGraphRangeChange = this.handleOnGraphRangeChange.bind(this);
         this.handleToggleShowInEuro = this.handleToggleShowInEuro.bind(this);
         this.handleRemoveSelected = this.handleRemoveSelected.bind(this);
+        this.handleOnRemovePortfolio = this.handleOnRemovePortfolio.bind(this);
     }
 
     // Move these two functions to myFunctions.js
@@ -282,6 +283,18 @@ class App extends React.Component {
             }
         )
     }
+    handleOnRemovePortfolio(portfolioName) {
+        // Delete the portfolio
+        let appData = this.state.appData;
+        delete appData[portfolioName];
+        this.setState(
+            { appData: appData },
+            () => {
+                console.log("==> Deleted portfolio '" + portfolioName + "'");
+                saveToLocalStorage(appData, LOCALSTORAGE_APPDATA_NAME);
+            }
+        )
+    }
 
     render() {
         console.log("==> App render");
@@ -323,6 +336,7 @@ class App extends React.Component {
                         onGraphRangeChange={this.handleOnGraphRangeChange}
                         onAddStock={this.handleAddStock}
                         onRemoveSelected={this.handleRemoveSelected}
+                        onRemovePortfolio={this.handleOnRemovePortfolio}
                     />
                 )}
             </div>

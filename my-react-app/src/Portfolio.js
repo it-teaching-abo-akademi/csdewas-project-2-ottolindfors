@@ -28,6 +28,7 @@ export class Portfolio extends React.Component {
         this.handleToggleShowAddStockModal = this.handleToggleShowAddStockModal.bind(this);
         this.handleAddStock = this.handleAddStock.bind(this);
         this.handleOnRemoveSelected = this.handleOnRemoveSelected.bind(this);
+        this.handleRemovePortfolio = this.handleRemovePortfolio.bind(this);
     }
     handleToggleShowInEuro(event) {
         this.props.onToggleShowInEuro(event);
@@ -49,6 +50,9 @@ export class Portfolio extends React.Component {
     }
     handleOnRemoveSelected(selectedRows) {
         this.props.onRemoveSelected(this.props.name, selectedRows);
+    }
+    handleRemovePortfolio() {
+        this.props.onRemovePortfolio(this.props.name)
     }
 
     render() {
@@ -117,7 +121,8 @@ export class Portfolio extends React.Component {
                     euroPerUsd={euroPerUsd}
                     onRemoveSelected={this.handleOnRemoveSelected}
                 />
-                <button>
+                <button
+                    onClick={this.handleRemovePortfolio}>
                     Remove portfolio
                 </button>
             </div>

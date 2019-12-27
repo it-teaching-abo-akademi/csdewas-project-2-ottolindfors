@@ -14,7 +14,6 @@ export class EvolutionGraph extends React.PureComponent{
     }
     graphRangeToDate(graphRange) {
         // graphRange options are 5d, 1m, 3m, 6m, ytd, 1y, 2y, 5y, max
-        console.log("graphRange: '" + graphRange + "'");
         if (graphRange.includes("d") && !graphRange.includes("ytd")) {
             const days = graphRange.replace("d", "");
             const dateToday = new Date();
