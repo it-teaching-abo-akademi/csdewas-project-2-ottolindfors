@@ -1,3 +1,8 @@
+# SPMS - Stock Portfolio Management System
+A javascript app, built using React, for building stock portfolios and keep track of their 
+performance.  
+Example: [https://it-teaching-abo-akademi.github.io/csdewas-project-2-ottolindfors/](https://it-teaching-abo-akademi.github.io/csdewas-project-2-ottolindfors/)
+
 ## Important
 For some reason the chart does not re-render after a stock is added eventhough the parent 
 (`App) component's state change. Please refresh the browser window to see the chart after 
