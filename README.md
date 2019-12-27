@@ -1,6 +1,7 @@
 ## Important
-For some reason the chart does not re-render after a stock is added. Please refresh the 
-browser window to see the chart after a stock is added to a portfolio.  
+For some reason the chart does not re-render after a stock is added eventhough the parent 
+(`App) component's state change. Please refresh the browser window to see the chart after 
+a stock is added to a portfolio.  
 To be fixed in a future version.
 
 ## A note on the functionality
@@ -32,3 +33,6 @@ today's value of the old price.
   leads to a too short axis.  
   **Solution:** Casting to number seems to do the trick. 
   `Number((chart[chartKey].close * euroPerUsd).toFixed(2))`
+  
+  * Chart does not refresh after a stock is added even though the state of the parent 
+  component (`App` component) changes.
