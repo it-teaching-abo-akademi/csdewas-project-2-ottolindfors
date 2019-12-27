@@ -1,4 +1,4 @@
-import {compareFunctionWDate, dateToChartRange} from "./myFunctions";
+import {compareFunctionWDate, dateToChartRange, saveToLocalStorage} from "./myFunctions";
 
 function handleOnUpdate(portfolioName) {
     // -- This should also be run when page loads (componentDidMount) --
@@ -36,4 +36,66 @@ function handleOnUpdate(portfolioName) {
     dataFetcher.then(stockData => {
 
     })
+}
+function createAndAppendDummyPortfolio(newPortfolioName, stockSymbols, type, chartRange) {
+    /*
+    Creates and appends a whole portfolio at once (with dummy 'purchase' element) to the appData state
+    */
+    console.log("==> Creating dummy portfolio '" + newPortfolioName + "'");
+    // dataFetcher uses fetch() so it returns a promise. Therefore newPortfolio.then() to access the result value.
+    const newPortfolio = this.dataFetcher(stockSymbols, type, chartRange);
+    newPortfolio.then(stockData =>
+        {
+            // Add dummy purchase data
+            for (let key in stockData) {
+                if (stockData.hasOwnProperty(key)) {
+                    stockData[key]["purchase"] = {date: "1970-01-01", price: 10.00, shares: 7, currency: "USD"};
+                }
+            }
+            // Add portfolio to appData
+            let appData = this.state.appData;
+            appData[newPortfolioName] = {"stocks": stockData};
+            // Add currency and graph visualisation range preference
+            appData[newPortfolioName]["userPrefs"] = {showInEuro: false, graphRange: "6m"};
+            // Set state
+            this.setState(
+                { appData: appData },
+                () => {
+                    console.log("==> State set. Dummy purchase data added to" + newPortfolioName);
+                    saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+                }
+            )
+        }
+    );
+}
+function refreshPortfolio(portfolioName) {
+    /*
+    Refresh portfolio data (called on button press)
+    */
+    console.log("==> Refreshing portfolio data '" + portfolioName + "'");
+
+    // Copy current portfolio
+    let appData = this.state.appData;
+
+    const stockSymbols = Object.keys(appData[portfolioName].stocks);
+    const type = "quote,chart";  // These are the types the application always and only show
+    const chartRange = "5d";  // Later improvement to only fetch the missing data to save loading time and server time (power)
+
+    let newStockData = this.dataFetcher(stockSymbols, type, chartRange);
+    newStockData.then(stockData => {
+        for (let stock in stockData) {
+            if (stockData.hasOwnProperty(stock)) {
+                // Overwrite old stock data
+                appData[portfolioName].stocks[stock].chart = stockData[stock].chart;
+            }
+        }
+        console.log("==> Refreshed portfolio:" , appData[portfolioName]);
+        this.setState(
+            { appData: appData },
+            () => {
+                console.log("==> Set state with newStockData and range 5d !!!!!!!!!!!!!!!!");
+                saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
+            }
+        );
+    });
 }

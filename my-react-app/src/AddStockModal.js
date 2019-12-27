@@ -23,8 +23,6 @@ export class AddStockModal extends React.Component {
         const purchaseDate = this.state.purchaseDate;
         const shares = this.state.shares;
 
-        console.log("==> Adding stock '" + stockSymbol + "'");
-
         let purchasePrice = null;
         this.setState(
             { loading: true },
@@ -70,8 +68,7 @@ export class AddStockModal extends React.Component {
     }
     render() {
         if (!this.props.show) {
-            // TODO: Should render nothing in the future
-            return <p>Modal hidden</p>
+            return null;
         }
         if (this.state.loading) {
             // Loading while fetching data
@@ -81,7 +78,7 @@ export class AddStockModal extends React.Component {
         }
         return (
             <div>
-                <p>Modal visible</p>
+                <h3>Add stock</h3>
                 <form onSubmit={this.handleOnsubmit}>
                     <label>
                         Stock symbol

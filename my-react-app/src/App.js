@@ -65,69 +65,6 @@ class App extends React.Component {
             .catch(error => this.setState({error: error}));
     }
 
-    createAndAppendDummyPortfolio(newPortfolioName, stockSymbols, type, chartRange) {
-        /*
-        Creates and appends a whole portfolio at once (with dummy 'purchase' element) to the appData state
-        */
-        console.log("==> Creating dummy portfolio '" + newPortfolioName + "'");
-        // dataFetcher uses fetch() so it returns a promise. Therefore newPortfolio.then() to access the result value.
-        const newPortfolio = this.dataFetcher(stockSymbols, type, chartRange);
-        newPortfolio.then(stockData =>
-            {
-                // Add dummy purchase data
-                for (let key in stockData) {
-                    if (stockData.hasOwnProperty(key)) {
-                        stockData[key]["purchase"] = {date: "1970-01-01", price: 10.00, shares: 7, currency: "USD"};
-                    }
-                }
-                // Add portfolio to appData
-                let appData = this.state.appData;
-                appData[newPortfolioName] = {"stocks": stockData};
-                // Add currency and graph visualisation range preference
-                appData[newPortfolioName]["userPrefs"] = {showInEuro: false, graphRange: "6m"};
-                // Set state
-                this.setState(
-                    { appData: appData },
-                    () => {
-                        console.log("==> State set. Dummy purchase data added to" + newPortfolioName);
-                        saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
-                    }
-                )
-            }
-        );
-    }
-    refreshPortfolio(portfolioName) {
-        /*
-        Refresh portfolio data (called on button press)
-        */
-        console.log("==> Refreshing portfolio data '" + portfolioName + "'");
-
-        // Copy current portfolio
-        let appData = this.state.appData;
-
-        const stockSymbols = Object.keys(appData[portfolioName].stocks);
-        const type = "quote,chart";  // These are the types the application always and only show
-        const chartRange = "5d";  // Later improvement to only fetch the missing data to save loading time and server time (power)
-
-        let newStockData = this.dataFetcher(stockSymbols, type, chartRange);
-        newStockData.then(stockData => {
-            for (let stock in stockData) {
-                if (stockData.hasOwnProperty(stock)) {
-                    // Overwrite old stock data
-                    appData[portfolioName].stocks[stock].chart = stockData[stock].chart;
-                }
-            }
-            console.log("==> Refreshed portfolio:" , appData[portfolioName]);
-            this.setState(
-                { appData: appData },
-                () => {
-                    console.log("==> Set state with newStockData and range 5d !!!!!!!!!!!!!!!!");
-                    saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
-                }
-            );
-        });
-    }
-
     componentDidMount() {
         /*
         FIRST TRY LOADING DATA FROM LOCAL STORAGE.
@@ -139,22 +76,12 @@ class App extends React.Component {
             const appData = loadFromLocalStorage(LOCALSTORAGE_APPDATA_NAME);  // Trows error if not found
             this.setState(
                 { appData: appData },
-                () => {
-                    console.log("==> State set. Loaded 'portfolios' and 'appData' from local storage");
-                    console.log("==> appData:", this.state.appData)
-                }
+                () => console.log("==> Loaded 'portfolios' and 'appData' from local storage")
             );
         }
         catch (error) {
+            // Silently fail
             console.log("==>", error);
-            // *** CREATE DUMMY DATA. DO NOT USE IN PRODUCTION ***
-            /*
-            console.log("==> Creating dummy data");
-            this.createAndAppendDummyPortfolio("My Big Portfolio", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', 'max');
-            this.createAndAppendDummyPortfolio("My Big Portfolio 2", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', 'max');
-            this.createAndAppendDummyPortfolio("My Big Portfolio 3", ["AAPL","GOOGL","TWTR","FB"], 'quote,chart', 'max');
-             */
-
         }
     }
 
@@ -165,7 +92,6 @@ class App extends React.Component {
         // Hide the modal
         this.toggleShowAddPortfolioModal();
         // Create new portfolio with no stocks default user preferences.
-        console.log("==> Creating new portfolio '" + newPortfolioName + "'");
         let appData = this.state.appData;
         appData[newPortfolioName] = {"userPrefs": DEFAULT_USER_PREFS};
         appData[newPortfolioName]["stocks"] = {};
@@ -202,7 +128,7 @@ class App extends React.Component {
             this.setState(
                 { appData: appData },
                 () => {
-                    console.log("==> State set. Stock data added to '" + portfolioName + "'");
+                    console.log("==> Stock data added to '" + portfolioName + "'");
                     saveToLocalStorage(this.state.appData, LOCALSTORAGE_APPDATA_NAME);
                 }
             )
@@ -254,10 +180,7 @@ class App extends React.Component {
         appData[portfolioName].userPrefs["graphRange"] = selectedGraphRange;
         this.setState(
             { appData: appData },
-            () => {
-                console.log("==> Set userPrefs.graphRange='" + selectedGraphRange + "' for '" + portfolioName + "'");
-                saveToLocalStorage(appData, LOCALSTORAGE_APPDATA_NAME);
-            }
+            () => saveToLocalStorage(appData, LOCALSTORAGE_APPDATA_NAME)
         )
     }
     handleToggleShowInEuro(event) {

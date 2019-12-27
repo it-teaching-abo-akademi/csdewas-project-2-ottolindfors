@@ -59,11 +59,11 @@ export class AddPortfolioModal extends React.Component {
     render() {
         if (!this.props.show) {
             // Should render nothing in the future
-            return <p>Modal hidden</p>;
+            return null;
         }
         return (
             <div>
-                <p>Modal visible</p>
+                <h2>Add a new portfolio</h2>
                 <form onSubmit={this.handleOnSubmit}>
                     <label>
                         Portfolio name
