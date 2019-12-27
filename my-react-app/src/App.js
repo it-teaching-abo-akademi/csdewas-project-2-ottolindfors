@@ -26,6 +26,7 @@ class App extends React.Component {
         this.handleOnUpdate = this.handleOnUpdate.bind(this);
         this.handleOnGraphRangeChange = this.handleOnGraphRangeChange.bind(this);
         this.handleToggleShowInEuro = this.handleToggleShowInEuro.bind(this);
+        this.handleRemoveSelected = this.handleRemoveSelected.bind(this);
     }
 
     // Move these two functions to myFunctions.js
@@ -264,6 +265,23 @@ class App extends React.Component {
         appData[portfolioName].userPrefs["showInEuro"] = !appData[portfolioName].userPrefs["showInEuro"];
         this.setState({ appData: appData });
     }
+    handleRemoveSelected(portfolioName, selectedRows) {
+        let appData = this.state.appData;
+        // Check which rows are marked for deletion
+        for (let [stockSymbol, booleanValue] of Object.entries(selectedRows)) {
+            if (booleanValue) {
+                // Delete stock entry
+                delete appData[portfolioName].stocks[stockSymbol]
+            }
+        }
+        this.setState(
+            { appData: appData },
+            () => {
+                console.log("==> Deleted selected stocks from '" + portfolioName + "'");
+                saveToLocalStorage(appData, LOCALSTORAGE_APPDATA_NAME);
+            }
+        )
+    }
 
     render() {
         console.log("==> App render");
@@ -304,6 +322,7 @@ class App extends React.Component {
                         onUpdate={this.handleOnUpdate}
                         onGraphRangeChange={this.handleOnGraphRangeChange}
                         onAddStock={this.handleAddStock}
+                        onRemoveSelected={this.handleRemoveSelected}
                     />
                 )}
             </div>

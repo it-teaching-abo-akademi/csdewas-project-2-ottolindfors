@@ -27,6 +27,7 @@ export class Portfolio extends React.Component {
         this.handleOnGraphRangeChange = this.handleOnGraphRangeChange.bind(this);
         this.handleToggleShowAddStockModal = this.handleToggleShowAddStockModal.bind(this);
         this.handleAddStock = this.handleAddStock.bind(this);
+        this.handleOnRemoveSelected = this.handleOnRemoveSelected.bind(this);
     }
     handleToggleShowInEuro(event) {
         this.props.onToggleShowInEuro(event);
@@ -46,6 +47,10 @@ export class Portfolio extends React.Component {
         this.handleToggleShowAddStockModal();
         this.props.onAddStock(this.props.name, stockSymbol, purchaseDate, purchasePrice, shares);
     }
+    handleOnRemoveSelected(selectedRows) {
+        this.props.onRemoveSelected(this.props.name, selectedRows);
+    }
+
     render() {
         // Prevent errors when initial (and maybe also other asynchronous) render happen before userPrefs and name are set in appData.
         if (typeof this.props.name === 'undefined' ||
@@ -110,6 +115,7 @@ export class Portfolio extends React.Component {
                     stocks={stocks}
                     showInEuro={showInEuro}
                     euroPerUsd={euroPerUsd}
+                    onRemoveSelected={this.handleOnRemoveSelected}
                 />
                 <button>
                     Remove portfolio

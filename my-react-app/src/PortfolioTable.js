@@ -1,6 +1,5 @@
 import React from "react";
 import {PortfolioTableRow} from "./PortfolioTableRow";
-import {RemoveSelectedBtn} from "./RemoveSelectedBtn";
 
 export class PortfolioTable extends React.Component {
     constructor(props) {
@@ -10,15 +9,15 @@ export class PortfolioTable extends React.Component {
             // NOTE: This is a derived state and should not be used.
             // https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
             // Atm i will continue with this and review it later.
-            // Using double negation will convert undefined/null to
-            // false and temporarily fix the problem of the state not
-            // being set at the initial render when passing
-            // checked={!!this.state.selectedRows[stock]} to the
-            // component <PortfolioTableRow/>
+            //
+            // Checking the number of keys in the object in selectedRows
+            // when rendering temporarily fixes the problem of the state not
+            // being set at the initial render.
             // *******************************************************
             selectedRows: [],  // [AAPL: true, FB: false, TWTR: true, ...]
         };
         this.handleRowCheckedChange = this.handleRowCheckedChange.bind(this);
+        this.handleOnClick = this.handleOnClick.bind(this);
     }
 
     componentDidMount() {
@@ -36,12 +35,15 @@ export class PortfolioTable extends React.Component {
     handleRowCheckedChange(event) {
         // Extract stock name and whether the <input ... /> is checked
         const stock = event.target.name;  // event.target is the <input ... /> element in PortfolioTableRow
-        const checked = event.target.checked;
+        const isChecked = event.target.checked;
 
         // Update the state
         let selectedRows = this.state.selectedRows;
-        selectedRows[stock] = checked;
+        selectedRows[stock] = isChecked;
         this.setState({ selectedRows: selectedRows });
+    }
+    handleOnClick() {
+        this.props.onRemoveSelected(this.state.selectedRows);
     }
 
     render() {
@@ -49,17 +51,19 @@ export class PortfolioTable extends React.Component {
         const showInEuro = this.props.showInEuro;
         const euroPerUsd = this.props.euroPerUsd;
 
+        const selectedRows = this.state.selectedRows;
+
         let rows = [];
-        for (let stock in stocks) {
-            if (stocks.hasOwnProperty(stock)) {
+        for (let stockSymbol in stocks) {
+            if (stocks.hasOwnProperty(stockSymbol)) {
                 rows.push(
                     <PortfolioTableRow
-                        key={stock}
-                        stock={stock}
-                        stockInfo={stocks[stock]}
+                        key={stockSymbol}
+                        stock={stockSymbol}
+                        stockInfo={stocks[stockSymbol]}
                         showInEuro={showInEuro}
                         euroPerUsd={euroPerUsd}
-                        checked={!!this.state.selectedRows[stock]}
+                        isChecked={Object.keys(selectedRows).length === 0 ? false : selectedRows[stockSymbol]}
                         onRowCheckedChange={this.handleRowCheckedChange}
                     />
                 );
@@ -68,7 +72,10 @@ export class PortfolioTable extends React.Component {
 
         return (
             <div>
-                <RemoveSelectedBtn selections={this.state.selections} />
+                <button
+                    onClick={this.handleOnClick}>
+                    Remove selected
+                </button>
                 <table>
                     <thead>
                     <tr>

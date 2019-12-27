@@ -5,8 +5,8 @@ export class PortfolioTableRow extends React.Component{
         this.handleCheckedChange = this.handleCheckedChange.bind(this);
     }
 
-    handleCheckedChange(e) {
-        this.props.onRowCheckedChange(e);  // e.target.checked, e.target.name checked = true/false, name = AAPL , FB,...
+    handleCheckedChange(event) {
+        this.props.onRowCheckedChange(event);  // e.target.checked, e.target.name checked = true/false, name = AAPL , FB,...
     }
 
     render() {
@@ -14,7 +14,7 @@ export class PortfolioTableRow extends React.Component{
         const stockData = this.props.stockInfo;
         const showInEuro = this.props.showInEuro;
         const euroPerUsd = this.props.euroPerUsd;
-        const checked = this.props.checked;
+        const isChecked = this.props.isChecked;
 
         const latestPrice = stockData.quote.latestPrice;
         const shares = stockData.purchase.shares;
@@ -29,7 +29,7 @@ export class PortfolioTableRow extends React.Component{
                 <td>{purchasePrice} {purchaseCurrency}</td>
                 <td>{shares}</td>
                 <td>{showInEuro ? (latestPrice * shares * euroPerUsd).toFixed(2) + " EUR" : (latestPrice * shares).toFixed(2) + " USD"}</td>
-                <td><input name={stock} type="checkbox" checked={checked} onChange={this.handleCheckedChange}/></td>
+                <td><input name={stock} type="checkbox" checked={isChecked} onChange={this.handleCheckedChange}/></td>
             </tr>
         );
     }
