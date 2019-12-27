@@ -1,6 +1,6 @@
 import React from "react";
 import {LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line, ResponsiveContainer} from "recharts";
-import {compareFunctionWName, dateToChartRange} from "./myFunctions";
+import {compareFunctionWName} from "./myFunctions";
 
 export class EvolutionGraph extends React.PureComponent{
 
@@ -14,30 +14,31 @@ export class EvolutionGraph extends React.PureComponent{
     }
     graphRangeToDate(graphRange) {
         // graphRange options are 5d, 1m, 3m, 6m, ytd, 1y, 2y, 5y, max
-        if (graphRange.includes("d")) {
+        console.log("graphRange: '" + graphRange + "'");
+        if (graphRange.includes("d") && !graphRange.includes("ytd")) {
             const days = graphRange.replace("d", "");
             const dateToday = new Date();
             // Set the date to 'days' number of days in the past and return the new date
             return new Date(new Date().setDate(dateToday.getDate() - days));
         }
-        if (graphRange.includes("m")) {
+        if (graphRange.includes("m") && !graphRange.includes("max")) {
             const months = graphRange.replace("m", "");  // 1m, 3m, 6m
             const dateToday = new Date();
             // Set the date to 'months' number of months in the past and return the new date
             return new Date(new Date().setMonth(dateToday.getMonth() - months));
         }
-        if (graphRange.includes('ytd')) {
+        if (graphRange.includes("ytd")) {
             // Return a Date object set to 1 Jan of the current year
             return new Date(new Date().toISOString().slice(0,4));  // new Date("2019") returns 1 Jan 2019
         }
-        if (graphRange.includes("y")) {
+        if (graphRange.includes("y") && !graphRange.includes("ytd")) {
             const years = graphRange.replace("y", "");
             const dateToday = new Date();
             // Set the date to 'years' number of years in the past and return the new date
             return new Date(new Date().setFullYear(dateToday.getFullYear() - years));
         }
-        if (graphRange.includes('max')) {
-            const years = 500;
+        if (graphRange.includes("max")) {
+            const years = 15;  // iexcloud provides 15 years of data at maximum
             const dateToday = new Date();
             // Set the date 500 years in the past and return the new date
             return new Date(new Date().setFullYear(dateToday.getFullYear() - years));

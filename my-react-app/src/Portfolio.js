@@ -24,6 +24,7 @@ export class Portfolio extends React.Component {
         };
         this.handleToggleShowInEuro = this.handleToggleShowInEuro.bind(this);
         this.handleOnUpdate = this.handleOnUpdate.bind(this);
+        this.handleOnGraphRangeChange = this.handleOnGraphRangeChange.bind(this);
         this.handleToggleShowAddStockModal = this.handleToggleShowAddStockModal.bind(this);
         this.handleAddStock = this.handleAddStock.bind(this);
     }
@@ -33,6 +34,10 @@ export class Portfolio extends React.Component {
     handleOnUpdate(event) {
         // Send portfolio's name to the parent function
         this.props.onUpdate(event.target.name);
+    }
+    handleOnGraphRangeChange(event) {
+        // Pas portfolio name and the selected range to the parent
+        this.props.onGraphRangeChange(this.props.name, event.target.value);
     }
     handleToggleShowAddStockModal() {
         this.setState({ showAddStockModal: !this.state.showAddStockModal });
@@ -81,7 +86,7 @@ export class Portfolio extends React.Component {
                         showInEuro={showInEuro}
                         euroPerUsd={euroPerUsd}
                     />
-                    <select defaultValue={graphRange}>
+                    <select defaultValue={graphRange} onChange={this.handleOnGraphRangeChange}>
                         {rangeOptions.map(entry => {
                             return <option
                                 key={entry.value}

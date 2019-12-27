@@ -1,12 +1,7 @@
 import React from 'react';
 import './App.css';
 import {urlBuilder, urlBuilderDate} from "./api";
-import {
-    compareFunctionWDate,
-    dateToChartRange,
-    loadFromLocalStorage,
-    saveToLocalStorage
-} from "./myFunctions";
+import {dateToChartRange, loadFromLocalStorage, saveToLocalStorage} from "./myFunctions";
 import {AddPortfolioModal} from './AddPortfolioModal'
 import {Portfolio} from "./Portfolio";
 import {minimizeData, minimizeDataStocksOnly} from "./dataFunctions";
@@ -29,6 +24,7 @@ class App extends React.Component {
         this.handleAddPortfolio = this.handleAddPortfolio.bind(this);
         this.handleAddStock = this.handleAddStock.bind(this);
         this.handleOnUpdate = this.handleOnUpdate.bind(this);
+        this.handleOnGraphRangeChange = this.handleOnGraphRangeChange.bind(this);
         this.handleToggleShowInEuro = this.handleToggleShowInEuro.bind(this);
     }
 
@@ -211,7 +207,7 @@ class App extends React.Component {
         });
     }
     async handleOnUpdate(portfolioName) {
-        // Ad-hoc solution to use async here.
+        // Ad-hoc solution to use async-await here.
         // The dataFetcher is asynchronous and therefore needs await.
         // Since dataFetcher is inside a for loop the loop would not otherwise "wait" in the results (.then)
 
@@ -225,7 +221,6 @@ class App extends React.Component {
         let stocks = appData[portfolioName].stocks;
         for (let stock in stocks) {
             if (stocks.hasOwnProperty(stock)) {
-                console.log(stock);
                 // Calculate the needed chartRange
                 const chartRange = dateToChartRange(stocks[stock].purchase.date);
                 // Fetch chart and quota data
@@ -234,7 +229,6 @@ class App extends React.Component {
                 // Fetch the new stock data
                 let dataFetcher = this.dataFetcher([stock], type, chartRange);
                 await dataFetcher.then(stockData => {
-                    console.log("then");
                     appData = minimizeDataStocksOnly(
                         stockData,
                         appData,
@@ -248,7 +242,18 @@ class App extends React.Component {
         this.setState(
             { appData: appData, isUpdating: false},
             () => {
-                console.log("==> Portfolio '" + portfolioName + "' updated", appData);
+                console.log("==> Updated portfolio '" + portfolioName + "'");
+                saveToLocalStorage(appData, LOCALSTORAGE_APPDATA_NAME);
+            }
+        )
+    }
+    handleOnGraphRangeChange(portfolioName, selectedGraphRange) {
+        let appData = this.state.appData;
+        appData[portfolioName].userPrefs["graphRange"] = selectedGraphRange;
+        this.setState(
+            { appData: appData },
+            () => {
+                console.log("==> Set userPrefs.graphRange='" + selectedGraphRange + "' for '" + portfolioName + "'");
                 saveToLocalStorage(appData, LOCALSTORAGE_APPDATA_NAME);
             }
         )
@@ -276,8 +281,7 @@ class App extends React.Component {
         return (
             <div className="App">
                 <h1>SPMS</h1>
-                <a href="https://iexcloud.io">Data provided by IEX Cloud</a>
-                <p>15 minute delay in price</p>
+                <p><a href="https://iexcloud.io">Data provided by IEX Cloud</a>. 15 minute delay in price.</p>
                 <button
                     onClick={this.toggleShowAddPortfolioModal}>
                     Add portfolio
@@ -298,6 +302,7 @@ class App extends React.Component {
                         isUpdating={this.state.isUpdating}
                         onToggleShowInEuro={this.handleToggleShowInEuro}
                         onUpdate={this.handleOnUpdate}
+                        onGraphRangeChange={this.handleOnGraphRangeChange}
                         onAddStock={this.handleAddStock}
                     />
                 )}
