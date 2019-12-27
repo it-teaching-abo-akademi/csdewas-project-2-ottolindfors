@@ -187,7 +187,10 @@ class App extends React.Component {
         const portfolioName = event.target.name;
         let appData = this.state.appData;
         appData[portfolioName].userPrefs["showInEuro"] = !appData[portfolioName].userPrefs["showInEuro"];
-        this.setState({ appData: appData });
+        this.setState(
+            { appData: appData },
+            () => saveToLocalStorage(appData, LOCALSTORAGE_APPDATA_NAME)
+            );
     }
     handleRemoveSelected(portfolioName, selectedRows) {
         let appData = this.state.appData;
