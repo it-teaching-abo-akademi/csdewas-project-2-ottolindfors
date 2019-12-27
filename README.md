@@ -6,9 +6,9 @@ sessions.
 Example: [https://it-teaching-abo-akademi.github.io/csdewas-project-2-ottolindfors/](https://it-teaching-abo-akademi.github.io/csdewas-project-2-ottolindfors/)
 
 ## Important
-For some reason the chart does not re-render after a stock is added eventhough the parent 
-(`App) component's state change. Please refresh the browser window to see the chart after 
-a stock is added to a portfolio.  
+For the chart to re-render after a stock is added please refresh the browser window. 
+The parent (`App`) component's state change but does for some reason not trigger the 
+re-rendering.    
 To be fixed in a future version.
 
 ## A note on the functionality
