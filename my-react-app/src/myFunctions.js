@@ -21,45 +21,43 @@ function saver(obj, objName) {
 export function dateToChartRange(isoPurchaseDate) {
     const purchaseDate = new Date(isoPurchaseDate);
     const todayDate = new Date();
+    // dayDiff = number of days since purchase date
     const dayDiff = Math.ceil((todayDate - purchaseDate) / (1000 * 60 * 60 * 24));  // Ceil ensures enough days
     const janFirst = new Date(new Date().toISOString().slice(0,4));  // new Date("2019") returns 1 Jan 2019
+    // ytdDiff = number of days since january 1 this year
     const ytdDiff = Math.ceil((todayDate - janFirst) / (1000 * 60 * 60 * 24));  // Days since Jan 1 (at most 365)
 
-
-    // graphRange options are 5d, 1m, 3m, 6m, ytd, 1y, 2y, 5y, max
+    // graph range options are 5d, 1m, 3m, 6m, ytd, 1y, 2y, 5y, max
+    let rangeOptionsString = ["5d", "1m", "3m", "6m", "1y", "2y", "5y"];  // options the API accept
+    let rangeOptionsInt = [5, 32, 94, 168, 367, 732, 1828];  // options used for finding the correct range
     let chartRange = "";
 
-    if (dayDiff < 5) {
-        // 5 days is enough
-        chartRange = "5d";
-        if (ytdDiff < 5) {chartRange = "ytd"}
-    }
-    else if (dayDiff < 32) {
-        // 1 month is enough
-        chartRange = "1m";
-        if (ytdDiff < 32) {chartRange = "ytd"}
-    }
-    else if (dayDiff < 94) {
-        // 3 months is enough
-        chartRange = "3m";
-        if (ytdDiff < 94) {chartRange = "ytd"}
-    }
-    else if (dayDiff< 168) {
-        chartRange = "6m";
-        if (ytdDiff < 168) {chartRange = "ytd"}
-    }
-    else if (dayDiff < 367) {
-        chartRange = "1y";
-        if (ytdDiff < 367) {chartRange = "ytd"}
-    }
-    else if (dayDiff < 732) {
-        chartRange = "2y";
-    }
-    else if (dayDiff < 1828) {
-        chartRange = "5y";
-    }
-    else {
-        chartRange = "max"
+    // Find the smallest range option that is larger than dayDiff
+    let i = 0;
+    let cont = true;
+    while(cont) {
+        if (dayDiff <= rangeOptionsInt[i]) {
+            // days since purchase is less than the current range option, i.e. chartRange=rangeOptionsInt[i] is a valid choice
+            if (ytdDiff >= dayDiff && ytdDiff <= rangeOptionsInt[i]) {
+                // When possible prefer ytd over fixed range rangeOptionsInt[i]
+                chartRange = "ytd";
+            } else {
+                // The API requires rangeOptionsString[i] instead of rangeOptionsInt[i]
+                chartRange = rangeOptionsString[i];
+            }
+            // Stop searching
+            cont = false;
+        } else {
+            // days since purchase is more than the current range option
+            if (i === rangeOptionsInt.length) {
+                // The range options are not enough. A greater range is needed
+                chartRange = "max";
+                // Stop searching
+                cont = false;
+            }
+        }
+        // continue to next element in rangeOptionsInt and rangeOptionsString
+        i++;
     }
 
     return chartRange;

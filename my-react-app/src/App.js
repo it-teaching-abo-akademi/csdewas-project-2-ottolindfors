@@ -109,6 +109,7 @@ class App extends React.Component {
 
         // Calculate the needed chartRange
         const chartRange = dateToChartRange(purchaseDate);
+        console.log("DEBUG: chart range to fetch from API:", chartRange);
         // Fetch chart and quota data
         const type = 'quote,chart';
 
@@ -239,6 +240,8 @@ class App extends React.Component {
             <div className="App">
                 <h1>SPMS</h1>
                 <p><a href="https://iexcloud.io">Data provided by IEX Cloud</a>. 15 minute delay in price.</p>
+                <p>This app is a work in progress.</p>
+                <p>Known issues: The graph does not update when a stock is added (manual refresh by user is needed).</p>
                 <button
                     onClick={this.toggleShowAddPortfolioModal}>
                     Add portfolio
