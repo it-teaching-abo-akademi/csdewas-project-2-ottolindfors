@@ -28,10 +28,11 @@ export function minimizeData(stockData, appData, portfolioName, purchaseDate, pu
     return appData;
 }
 
+/*
+Clean data fetched from API for a smaller storage footprint
+Does not manipulate purchase date
+ */
 export function minimizeDataStocksOnly(stockData, appData, portfolioName) {
-    // Clean data fetched from API for a smaller storage footprint
-    // Does not manipulate purchase date
-
     const stockSymbol = Object.keys(stockData)[0];
 
     // Get only the necessary quote data
