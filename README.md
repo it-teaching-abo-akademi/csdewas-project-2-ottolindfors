@@ -2,11 +2,12 @@
 1. [About](#about-stock-portfolio-management-system-(spms))  
 2. [Run it yourself](#run-it-yourself)
 # 1. About Stock Portfolio Management System (SPMS)
-A javascript app, built using React, for managing stock portfolios and keep track of their 
-performance. The app uses the browser's local storage for saving the portfolios across 
-sessions.  
+
+### What does it do?
+This is a javascript app running in the web browser, built using React, for managing stock portfolios and keep track of 
+their performance. The app uses the browser's local storage for saving the portfolios across sessions.  
   
-Example: [https://it-teaching-abo-akademi.github.io/csdewas-project-2-ottolindfors/](https://it-teaching-abo-akademi.github.io/csdewas-project-2-ottolindfors/)
+Try it out: [https://it-teaching-abo-akademi.github.io/csdewas-project-2-ottolindfors/](https://it-teaching-abo-akademi.github.io/csdewas-project-2-ottolindfors/)
 
 ### Limitations
 
