@@ -8,17 +8,21 @@ import {minimizeData, minimizeDataStocksOnly} from "./dataFunctions";
 
 // TODO: Reuse code segments
 
+// Name of the JSON file that will be stored in the browser's local storage
 const LOCALSTORAGE_APPDATA_NAME = 'appData';
+
+// Default preferences for new portfolios
 const DEFAULT_USER_PREFS = {showInEuro: false, graphRange: "6m"};
 
+
 class App extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
-            appData: {},  // All data
-            showAddPortfolioModal: false,
-            loading: false,
-            isUpdating: false,
+            appData: {},  // All data the app uses
+            showAddPortfolioModal: false,  // For toggling the visibility of AddPortfolioModal
+            isUpdating: false,  // Used in Portfolio for changing button text.
         };
         this.toggleShowAddPortfolioModal = this.toggleShowAddPortfolioModal.bind(this);
         this.handleAddPortfolio = this.handleAddPortfolio.bind(this);
@@ -30,13 +34,18 @@ class App extends React.Component {
         this.handleOnRemovePortfolio = this.handleOnRemovePortfolio.bind(this);
     }
 
-    // Move these two functions to myFunctions.js
-    // Fetches latest quote and/or chart (historic data) for all stockSymbols
+    // TODO: Move following two functions to myFunctions.js
+    /*
+    Fetches latest quote and/or chart (historic data) for all stockSymbols.
+    Returns the fetched data object or throws an error.
+     */
     dataFetcher(stockSymbols, type, chartRange) {
+        // Get the URI
         const apiUrl = urlBuilder(stockSymbols, type, chartRange);
+        // Fetch the stock data
         return fetch(apiUrl)
             .then(response => {
-                // "Parse" json
+                // "Parse" the json
                 if (response.ok) {
                     return response.json()
                 } else {
@@ -44,12 +53,20 @@ class App extends React.Component {
                 }
             })
             .then(jsonData => {
+                // Return the json data object
                 return jsonData;
             })
             .catch(error => this.setState({error: error}));
     }
+
+    /*
+    Fetch the closing price of some stock at a specific date. Used for fetching purchase prices.
+    Returns the closing price or throws an error.
+     */
     puchasePriceFetcher(stockSymbol, yyyymmdd) {
+        // Get the URI
         const apiUrl = urlBuilderDate(stockSymbol, yyyymmdd);
+        // Fetch the stock data (purchase price)
         return fetch(apiUrl)
             .then(response => {
                 // "Parse" json
@@ -60,18 +77,21 @@ class App extends React.Component {
                 }
             })
             .then(jsonData => {
+                // Returns the stock's closing price
                 return jsonData[0].close;
             })
             .catch(error => this.setState({error: error}));
     }
 
+    /*
+    Tries to load appData from local storage when the page is refreshed. If there is nothing to load from local storage
+    (meaning the user has not visited the site before, or has deleted local storage between visits) an error is printed
+    to the console. This is part of the normal functionality and is not an indication of something malfunctioning.
+     */
     componentDidMount() {
-        /*
-        FIRST TRY LOADING DATA FROM LOCAL STORAGE.
-        IF THERE IS NOTHING IN LOCAL STORAGE THEN LOAD FROM INTERNET (BUT ONLY ON USER INPUT REFRESH/GET/ADD BUTTON)
-         */
+        // Output message in console (mostly for debugging purpose)
         console.log("==> componentDidLoad");
-        // Load array of portfolio names and all app data from local storage. Throws error if not found and fails silently outputting error only to console.
+        // Try loading appData from local storage.
         try {
             const appData = loadFromLocalStorage(LOCALSTORAGE_APPDATA_NAME);  // Trows error if not found
             this.setState(
@@ -80,21 +100,30 @@ class App extends React.Component {
             );
         }
         catch (error) {
-            // Silently fail
-            console.log("==>", error);
+            // No appData Output error to console
+            console.log("==> No appData in local storage :", error);
         }
     }
 
+    /*
+    Toggle visibility of AddPortfolioModal.
+     */
     toggleShowAddPortfolioModal() {
         this.setState({ showAddPortfolioModal: !this.state.showAddPortfolioModal });
     };
+
+    /*
+    Create a new portfolio and save to local storage.
+     */
     handleAddPortfolio(newPortfolioName) {
         // Hide the modal
         this.toggleShowAddPortfolioModal();
-        // Create new portfolio with no stocks default user preferences.
+        // copy the current state
         let appData = this.state.appData;
+        // Add new empty portfolio with default user preferences
         appData[newPortfolioName] = {"userPrefs": DEFAULT_USER_PREFS};
         appData[newPortfolioName]["stocks"] = {};
+        // Set state (save appData with the new portfolio)
         this.setState(
             {appData: appData},
             () => {
@@ -103,6 +132,10 @@ class App extends React.Component {
             }
         );
     }
+
+    /*
+    Add stock to portfolio.
+     */
     handleAddStock(portfolioName, stockSymbol, purchaseDate, purchasePrice, shares) {
         // Add a new stock to the portfolio in appData and save to local storage.
         console.log("==> Adding stock to", portfolioName, stockSymbol, purchaseDate, purchasePrice, shares);
