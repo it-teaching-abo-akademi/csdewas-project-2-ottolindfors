@@ -23,6 +23,8 @@ class App extends React.Component {
             appData: {},  // All data the app uses
             showAddPortfolioModal: false,  // For toggling the visibility of AddPortfolioModal
             isUpdating: false,  // Used in Portfolio for changing button text.
+            // TODO: isUpdating affect "update" buttons for all portfolios when used as a state for the whole App.
+            //  Wanted result is to only affect individual Portfolios separately.
         };
         this.toggleShowAddPortfolioModal = this.toggleShowAddPortfolioModal.bind(this);
         this.handleAddPortfolio = this.handleAddPortfolio.bind(this);
@@ -36,7 +38,7 @@ class App extends React.Component {
 
     // TODO: Move following two functions to myFunctions.js
     /*
-    Fetches latest quote and/or chart (historic data) for all stockSymbols.
+    Fetches latest specified types of data for all stockSymbols.
     Returns the fetched data object or throws an error.
      */
     dataFetcher(stockSymbols, type, chartRange) {
@@ -134,21 +136,21 @@ class App extends React.Component {
     }
 
     /*
-    Add stock to portfolio.
+    Add a new stock to the portfolio (in state.appData), fetch quote and chart data (IEXCloud API), and save to local storage.
      */
     handleAddStock(portfolioName, stockSymbol, purchaseDate, purchasePrice, shares) {
-        // Add a new stock to the portfolio in appData and save to local storage.
         console.log("==> Adding stock to", portfolioName, stockSymbol, purchaseDate, purchasePrice, shares);
 
-        // Calculate the needed chartRange
+        // Calculate the needed chartRange from purchaseDate
         const chartRange = dateToChartRange(purchaseDate);
-        console.log("DEBUG: chart range to fetch from API:", chartRange);
-        // Fetch chart and quota data
-        const type = 'quote,chart';
 
+        // Fetch chart and quota data
+        const type = 'quote,chart';  // quote for latest data, chart for historical data
         let dataFetcher = this.dataFetcher([stockSymbol], type, chartRange);
         dataFetcher.then(stockData => {
+            // Copy appData from state
             let appData = this.state.appData;
+            // Add new cleaned (minimized) stock data to appData
             appData = minimizeData(
                 stockData,
                 appData,
@@ -168,28 +170,33 @@ class App extends React.Component {
             )
         });
     }
-    async handleOnUpdate(portfolioName) {
-        // Ad-hoc solution to use async-await here.
-        // The dataFetcher is asynchronous and therefore needs await.
-        // Since dataFetcher is inside a for loop the loop would not otherwise "wait" in the results (.then)
 
-        // Basically the same as handleAddStock
+    /*
+    Fetches latest (updates) stock data since purchase date for all stocks in a portfolio in state.appData.
+    Using async/await is an ad-hoc solution and is used since dataFetcher() is asynchronous. The motivation for using
+    await is that since dataFetcher() is inside a for-loop the loop would not otherwise "wait" for the dataFetcher to
+    complete fetching the data and the dataFetcher.then() would never be executed.
+     */
+    async handleOnUpdate(portfolioName) {
         console.log("==> Updating '" + portfolioName + "'");
+
+        // Change text inside the "update" button int the Portfolios
         this.setState({ isUpdating : true });
 
+        // Copy appData
         let appData = this.state.appData;
 
-        // Update one stock at a time since the purchase dates may wildly vary
+        // Update one stock at a time
         let stocks = appData[portfolioName].stocks;
         for (let stock in stocks) {
             if (stocks.hasOwnProperty(stock)) {
-                // Calculate the needed chartRange
+                // Calculate the needed chartRange from purchase date
                 const chartRange = dateToChartRange(stocks[stock].purchase.date);
                 // Fetch chart and quota data
                 const type = 'quote,chart';
-
                 // Fetch the new stock data
                 let dataFetcher = this.dataFetcher([stock], type, chartRange);
+                // await is used so that the execution of the for-loop waits for the execution of .then()
                 await dataFetcher.then(stockData => {
                     appData = minimizeDataStocksOnly(
                         stockData,
@@ -209,24 +216,47 @@ class App extends React.Component {
             }
         )
     }
+
+    /*
+    Change the visible date range in the stock graph.
+     */
     handleOnGraphRangeChange(portfolioName, selectedGraphRange) {
+        // Copy state.appData
         let appData = this.state.appData;
+        // Modify userPrefs for portfolio
         appData[portfolioName].userPrefs["graphRange"] = selectedGraphRange;
+        // Set state and save to local storage
         this.setState(
             { appData: appData },
             () => saveToLocalStorage(appData, LOCALSTORAGE_APPDATA_NAME)
         )
     }
+
+    /*
+    Toggle shown currencies for a portfolio. Does not affect purchase price since historical changes in a currency's
+    value would have to be considered.
+     */
     handleToggleShowInEuro(event) {
+        // Get portfolio name from the event (triggered by button in Portfolio)
         const portfolioName = event.target.name;
+        // Copy state.appData
         let appData = this.state.appData;
+        // Toggle currency
         appData[portfolioName].userPrefs["showInEuro"] = !appData[portfolioName].userPrefs["showInEuro"];
+        // Set state and save to local storage
         this.setState(
             { appData: appData },
             () => saveToLocalStorage(appData, LOCALSTORAGE_APPDATA_NAME)
             );
     }
+
+    /*
+    Removes rows from a portfolio in state.appData.
+    Takes as input the name of a portfolio, and an array of pairs consisting of stockSymbol and a boolean value telling
+    whether the stock symbol is selected for removal or not.
+     */
     handleRemoveSelected(portfolioName, selectedRows) {
+        // Copy appData
         let appData = this.state.appData;
         // Check which rows are marked for deletion
         for (let [stockSymbol, booleanValue] of Object.entries(selectedRows)) {
@@ -243,10 +273,16 @@ class App extends React.Component {
             }
         )
     }
+
+    /*
+    Removes a portfolio.
+     */
     handleOnRemovePortfolio(portfolioName) {
-        // Delete the portfolio
+        // Copy state.appData for manipulation
         let appData = this.state.appData;
+        // Delete the portfolio
         delete appData[portfolioName];
+        // Set state and save to local storage
         this.setState(
             { appData: appData },
             () => {
@@ -256,10 +292,13 @@ class App extends React.Component {
         )
     }
 
+    /*
+    Render the app.
+     */
     render() {
         console.log("==> App render");
 
-        // Get list of portfolios from appData
+        // Get list of portfolios from state.appData
         const appData = this.state.appData;
         let portfolios = [];
         for (let portfolioName in appData) {
@@ -268,26 +307,26 @@ class App extends React.Component {
             }
         }
 
-        // Render portfolios and 'add portfolio' button
         return (
             <div className="App">
                 <h1>SPMS</h1>
                 <p><a href="https://iexcloud.io">Data provided by IEX Cloud</a>. 15 minute delay in price.</p>
                 <p>This app is a work in progress.</p>
                 <p>Known issues: The graph does not update when a stock is added (manual refresh by user is needed).</p>
+
                 <button
                     onClick={this.toggleShowAddPortfolioModal}>
                     Add portfolio
                 </button>
+
                 <AddPortfolioModal
                     show={this.state.showAddPortfolioModal}
                     onCancel={this.toggleShowAddPortfolioModal}
                     onAdd={this.handleAddPortfolio}
                     portfolios={portfolios}>
-                    "We are the children of this modal"
                 </AddPortfolioModal>
+
                 {portfolios.map(portfolioName =>
-                    // Pass portfolio name and portfolio data to the portfolio
                     <Portfolio
                         key={portfolioName}
                         name={portfolioName}
