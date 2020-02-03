@@ -36,7 +36,7 @@ class App extends React.Component {
         this.handleOnRemovePortfolio = this.handleOnRemovePortfolio.bind(this);
     }
 
-    // TODO: Move following two functions to myFunctions.js
+    // TODO: Move dataFetcher() and puchasePriceFetcher() to myFunctions.js
     /*
     Fetches latest specified types of data for all stockSymbols.
     Returns the fetched data object or throws an error.
