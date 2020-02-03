@@ -1,3 +1,7 @@
+/*
+Unused code that is saved for possible reference at a later time.
+ */
+
 import {compareFunctionWDate, dateToChartRange, saveToLocalStorage} from "./myFunctions";
 
 function handleOnUpdate(portfolioName) {
