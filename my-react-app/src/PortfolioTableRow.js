@@ -10,6 +10,7 @@ export class PortfolioTableRow extends React.Component{
     }
 
     render() {
+        // Props
         const stock = this.props.stock;
         const stockData = this.props.stockInfo;
         const showInEuro = this.props.showInEuro;

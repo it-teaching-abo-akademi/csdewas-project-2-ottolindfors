@@ -47,10 +47,13 @@ export class PortfolioTable extends React.Component {
     }
 
     render() {
+        // Props
         const stocks = this.props.stocks;
         const showInEuro = this.props.showInEuro;
         const euroPerUsd = this.props.euroPerUsd;
 
+        // TODO: Do not use derived states
+        // Derived state
         const selectedRows = this.state.selectedRows;
 
         let rows = [];
