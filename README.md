@@ -1,4 +1,6 @@
-# SPMS - Stock Portfolio Management System
+1. [About](#about-stock-portfolio-management-system-(spms))  
+2. [Run it yourself](#run-it-yourself)
+# About Stock Portfolio Management System (SPMS)
 A javascript app, built using React, for managing stock portfolios and keep track of their 
 performance. The app uses the browser's local storage for saving the portfolios across 
 sessions.  
@@ -25,7 +27,7 @@ today's value of the currency at the purchase date and is for simplicity left ou
   leads to a too short axis.  
     * **Solution:** Casting to number does the trick. `Number((chart[chartKey].close * euroPerUsd).toFixed(2))`
     
-# Run it yourself
+# 2. Run it yourself
 
 If you want to reproduce the app yourself from scratch, the app is created using create-react-app which will
 give you a template to start from. From there you can start reproducing my app yourself.
