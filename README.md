@@ -44,6 +44,10 @@ The following needs to be installed if you intend to clone/fork this project:
 * Node.js
 * yarn
 
+The app currently uses the IEX Cloud API so you will need an API token for that (instructions below). 
+I have not implemented interfaces for fetching the data (==> swapping providers), but that could 
+be a fun project to do (should not be too difficult).
+
 ### Install the packages listed in yarn.lock
 
 Change directory into the my-react-app directory of this project. For me this is:
@@ -55,6 +59,17 @@ I am using yarn instead of npm so all dependencies for this project are listed i
 To install the dependencies just run: 
 ```
 yarn install
+```
+
+### IEX Cloud Token
+
+Go to [https://iexcloud.io/](https://iexcloud.io/) and get a token for accessing their API (sign up required). Once signed
+in you can very easily create a token. Refer to IEX Cloud's own instructions if you get stuck as the 
+procedure may change.
+
+Add your token to `my-react-app/src/api.js` to `row:1`  
+```
+const TOKEN = 'add-your-personal-token-here';
 ```
 
 ### Happy coding
