@@ -1,6 +1,6 @@
 1. [About](#about-stock-portfolio-management-system-(spms))  
 2. [Run it yourself](#run-it-yourself)
-# About Stock Portfolio Management System (SPMS)
+# 1. About Stock Portfolio Management System (SPMS)
 A javascript app, built using React, for managing stock portfolios and keep track of their 
 performance. The app uses the browser's local storage for saving the portfolios across 
 sessions.  
