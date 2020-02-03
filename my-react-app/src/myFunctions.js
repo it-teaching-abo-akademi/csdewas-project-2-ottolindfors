@@ -10,6 +10,10 @@ function loader(objName) {
     return data;
 }
 
+export const loadFromLocalStorage = (objName) => {
+    return loader(objName);
+};
+
 function saver(obj, objName) {
     /*
     Saves an JSON object to local storage.
@@ -17,6 +21,10 @@ function saver(obj, objName) {
     localStorage.setItem(objName, JSON.stringify(obj));
     console.log("==> Saved to local storage '" + objName + "'");
 }
+
+export const saveToLocalStorage = (obj, objName) => {
+    return saver(obj, objName);
+};
 
 export function dateToChartRange(isoPurchaseDate) {
     const purchaseDate = new Date(isoPurchaseDate);
@@ -75,10 +83,3 @@ export function compareFunctionWDate(a, b) {
     return 0;
 }
 
-export const loadFromLocalStorage = (objName) => {
-  return loader(objName);
-};
-
-export const saveToLocalStorage = (obj, objName) => {
-    return saver(obj, objName);
-};
