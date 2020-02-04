@@ -76,3 +76,16 @@ const TOKEN = 'add-your-personal-token-here';
 
 That should be it! Now you can start playing around and improving on the code.  
 Let me know if there is anything in these instructions I have missed.
+
+### Run and build the app
+
+React language needs to be translated (transpiled) into JavaScript for browsers to understand it.
+To build (transpile) a **development build** of the app navigate into `my-react-app` and run
+```
+yarn run
+```
+
+To build (transpile) a **production build** (one that is optimised for performance) run
+```
+yarn build
+```
